@@ -52,12 +52,12 @@ spec:
               write_files:
                 - path: /etc/yum.repos.d/mongodb.repo
                   content: |
-                    [mongodb-org-4.4]
+                    [mongodb-org-5.0]
                     name=MongoDB Repository
-                    baseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/4.4/x86_64/
+                    baseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/5.0/x86_64/
                     gpgcheck=1
                     enabled=1
-                    gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
+                    gpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc
                 - path: /root/init-mongo.js
                   content: |
                     db = new Mongo().getDB("demo");
@@ -70,7 +70,8 @@ spec:
                 - dnf install -y mongodb-org mongodb-org-server mongodb-org-shell mongodb-org-mongos
                 - dnf install -y mongodb-org-tools
                 - systemctl daemon-reload
-                - systemctl enable --now mongod.service
+                - systemctl enable mongod.service
+                - systemctl start mongod.service
                 - sleep 10
                 - chmod +x /root/adjust_config_mongo.sh
                 - sh /root/adjust_config_mongo.sh
@@ -80,3 +81,16 @@ spec:
         - name: mongodb-data
           persistentVolumeClaim:
             claimName: mongodb-pvc
+      readinessProbe:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - |
+            set -eo pipefail
+            mongo --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 2)' | grep -q 0
+        initialDelaySeconds: 15
+        timeoutSeconds: 2
+        periodSeconds: 10
+        successThreshold: 1
+        failureThreshold: 5

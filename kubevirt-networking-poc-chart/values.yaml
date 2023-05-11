@@ -10,4 +10,4 @@ app:
 
 vm:
   imageName: kubevirt/fedora-cloud-container-disk-demo
-  imageTag: v0.36.4
+  imageTag: v0.41.2
