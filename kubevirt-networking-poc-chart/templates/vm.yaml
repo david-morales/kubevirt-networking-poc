@@ -50,47 +50,32 @@ spec:
               hostname: mongodb-vm
               package_upgrade: true
               write_files:
-                - path: /etc/yum.repos.d/mongodb.repo
+                - path: /etc/yum.repos.d/mongodb-org-6.0.repo
                   content: |
-                    [mongodb-org-5.0]
+                    [mongodb-org-6.0]
                     name=MongoDB Repository
-                    baseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/5.0/x86_64/
+                    baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/6.0/x86_64/
                     gpgcheck=1
                     enabled=1
-                    gpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc
+                    gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
                 - path: /root/init-mongo.js
                   content: |
                     db = new Mongo().getDB("demo");
-                    db.names.insert({name: "John Doe"});
+                    db.names.insertOne({name: "John Doe"});
                 - path: /root/adjust_config_mongo.sh
                   content: |
                     sed -i 's/^\( *bindIp *: *\).*/\10.0.0.0/' /etc/mongod.conf
               runcmd:
                 - dnf install -y epel-release
-                - dnf install -y mongodb-org mongodb-org-server mongodb-org-shell mongodb-org-mongos
-                - dnf install -y mongodb-org-tools
+                - yum install -y mongodb-org
                 - systemctl daemon-reload
-                - systemctl enable mongod.service
-                - systemctl start mongod.service
+                - systemctl enable --now mongod.service
                 - sleep 10
                 - chmod +x /root/adjust_config_mongo.sh
                 - sh /root/adjust_config_mongo.sh
                 - systemctl restart mongod.service
                 - sleep 10
-                - mongo < /root/init-mongo.js
+                - mongosh < /root/init-mongo.js
         - name: mongodb-data
           persistentVolumeClaim:
             claimName: mongodb-pvc
-      readinessProbe:
-        exec:
-          command:
-          - /bin/bash
-          - -c
-          - |
-            set -eo pipefail
-            mongo --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 2)' | grep -q 0
-        initialDelaySeconds: 15
-        timeoutSeconds: 2
-        periodSeconds: 10
-        successThreshold: 1
-        failureThreshold: 5

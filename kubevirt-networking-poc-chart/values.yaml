@@ -9,5 +9,5 @@ app:
     port: 8080
 
 vm:
-  imageName: kubevirt/fedora-cloud-container-disk-demo
-  imageTag: v0.41.2
+  imageName: quay.io/containerdisks/centos-stream
+  imageTag: 9
