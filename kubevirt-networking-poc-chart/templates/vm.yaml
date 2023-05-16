@@ -98,4 +98,4 @@ spec:
             claimName: mongodb-pvc
         - name: tls-cert
           secret:
-          secretName: mongodb-cert-tls
+            secretName: mongodb-cert-tls
