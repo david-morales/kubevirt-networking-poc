@@ -80,6 +80,7 @@ spec:
                         config = yaml.load(file)
                     if 'net' not in config:
                         config['net'] = {}
+                    config['net']['bindIp'] = '0.0.0.0'
                     if 'tls' not in config['net']:
                         config['net']['tls'] = {}
                     config['net']['tls']['mode'] = 'requireTLS'
