@@ -60,7 +60,7 @@ spec:
                   sudo: ALL=(ALL) NOPASSWD:ALL
               hostname: mongodb-vm
               package_upgrade: true
-              # mount the secret
+              # mount the secret disk
               bootcmd:
                 - "mount /dev/disk/by-id/ata-QEMU_HARDDISK_secret /mnt/mysecret"
               write_files:
