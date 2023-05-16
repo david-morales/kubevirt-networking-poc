@@ -1,8 +1,8 @@
-namespace: kubevirt-networking-poc
+namespace: poc-certificates
 
 app:
   image:
-    repository: image-registry.openshift-image-registry.svc:5000/kubevirt-networking-poc/kubevirt-networking-poc
+    repository: image-registry.openshift-image-registry.svc:5000/poc-certificates/poc-certificates
     tag: latest
   service:
     type: LoadBalancer
