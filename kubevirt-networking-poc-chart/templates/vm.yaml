@@ -74,6 +74,30 @@ spec:
                     gpgcheck=1
                     enabled=1
                     gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
+                - path: /root/adjust_mongod_config.py
+                  content: |
+                    import ruamel.yaml
+
+                    yaml = ruamel.yaml.YAML()
+
+                    # Load existing config
+                    with open('/etc/mongod.conf', 'r') as file:
+                        config = yaml.load(file)
+
+                    # Ensure net.tls section exists
+                    if 'net' not in config:
+                        config['net'] = {}
+                    if 'tls' not in config['net']:
+                        config['net']['tls'] = {}
+
+                    # Set the necessary values
+                    config['net']['tls']['mode'] = 'requireTLS'
+                    config['net']['tls']['certificateKeyFile'] = '/etc/ssl/mongodb.pem'
+                    config['net']['tls']['CAFile'] = '/etc/ssl/ca.crt'
+
+                    # Write back to file
+                    with open('/etc/mongod.conf', 'w') as file:
+                        yaml.dump(config, file)
                 - path: /root/init-mongo.js
                   content: |
                     db = new Mongo().getDB("demo");
@@ -83,15 +107,13 @@ spec:
                     cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
                     cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
                     cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
-                    sed -i 's/^\( *bindIp *: *\).*/\10.0.0.0/' /etc/mongod.conf
-                    sed -i 's/^\( *sslMode *: *\).*/\1requireSSL/' /etc/mongod.conf
-                    sed -i 's/^\( *sslPEMKeyFile *: *\).*/\1\/etc\/ssl\/mongodb.pem/' /etc/mongod.conf
-                    sed -i 's/^\( *sslCAFile *: *\).*/\1\/etc\/ssl\/ca.crt/' /etc/mongod.conf
+                    python3 /root/adjust_mongod_config.py
               runcmd:
                 - dnf install -y epel-release
                 - yum install -y mongodb-org
+                - dnf install -y python3 python3-pip
+                - pip3 install ruamel.yaml
                 - systemctl daemon-reload
-                - systemctl enable --now mongod.service
                 - sleep 10
                 - chmod +x /root/adjust_config_mongo.sh
                 - sh /root/adjust_config_mongo.sh
