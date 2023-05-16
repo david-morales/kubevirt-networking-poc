@@ -10,22 +10,16 @@ COPY requirements.txt .
 # Install the required packages
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create certificates directory
-RUN mkdir ./certificates
-
 # Copy the certificate files
-COPY /certificates/tls.crt ./certificates
-COPY /certificates/tls.key ./certificates
-COPY /certificates/ca.crt ./certificates
+COPY /certificates/tls.crt .
+COPY /certificates/tls.key .
+COPY /certificates/ca.crt .
 
 # Rename ca.crt to ca.pem
-RUN mv ./certificates/ca.crt ./certificates/ca.pem
-
-# Set permissions for certificates
-RUN chmod 644 ./certificates/*
+RUN mv ./ca.crt ./ca.pem
 
 # Concatenate the certificate and key into a single PEM file
-RUN cat ./certificates/tls.crt ./certificates/tls.key > ./certificates/tls.pem
+RUN cat ./tls.crt ./tls.key > ./tls.pem
 
 # Copy the application code
 COPY app.py .
