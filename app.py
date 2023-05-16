@@ -8,8 +8,8 @@ def welcome():
     # Use the concatenated certificate and key file in the MongoClient connection
     client = MongoClient('mongodb', 27017, 
                             tls=True, 
-                            tlsCertificateKeyFile='/certificates/tls.pem', 
-                            tlsCAFile='/certificates/ca.pem')
+                            tlsCertificateKeyFile='./certificates/tls.pem', 
+                            tlsCAFile='./certificates/ca.pem')
     db = client['demo']
     collection = db['names']
     name = collection.find_one()['name']
