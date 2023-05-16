@@ -60,9 +60,7 @@ spec:
                   sudo: ALL=(ALL) NOPASSWD:ALL
               hostname: mongodb-vm
               package_upgrade: true
-              # mount the secret disk
               bootcmd:
-                # mount the Secret
                 - "mkdir /mnt/mongodb-cert-tls"
                 - "mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls"
               write_files:
@@ -77,25 +75,16 @@ spec:
                 - path: /root/adjust_mongod_config.py
                   content: |
                     import ruamel.yaml
-
                     yaml = ruamel.yaml.YAML()
-
-                    # Load existing config
                     with open('/etc/mongod.conf', 'r') as file:
                         config = yaml.load(file)
-
-                    # Ensure net.tls section exists
                     if 'net' not in config:
                         config['net'] = {}
                     if 'tls' not in config['net']:
                         config['net']['tls'] = {}
-
-                    # Set the necessary values
                     config['net']['tls']['mode'] = 'requireTLS'
                     config['net']['tls']['certificateKeyFile'] = '/etc/ssl/mongodb.pem'
                     config['net']['tls']['CAFile'] = '/etc/ssl/ca.crt'
-
-                    # Write back to file
                     with open('/etc/mongod.conf', 'w') as file:
                         yaml.dump(config, file)
                 - path: /root/init-mongo.js
