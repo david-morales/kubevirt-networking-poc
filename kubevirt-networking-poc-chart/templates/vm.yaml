@@ -50,7 +50,7 @@ spec:
             image: "{{ .Values.vm.imageName }}:{{ .Values.vm.imageTag }}"
         - name: cloudinitdisk
           cloudInitNoCloud:
-            userDataSecretRef:
+            secretRef:
               name: mongodb-vm-userdata
         - name: mongodb-data
           persistentVolumeClaim:
