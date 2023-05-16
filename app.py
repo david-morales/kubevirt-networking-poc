@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/')
 def welcome():
     # Concatenate the certificate and key into a single PEM file at runtime
-    pem_file_path = "/.tls.pem"
+    pem_file_path = "/tmp/tls.pem"
     with open(pem_file_path, 'w') as pem_file:
         with open('/certificates/tls.crt', 'r') as crt_file:
             pem_file.write(crt_file.read())
