@@ -95,6 +95,7 @@ spec:
                   content: |
                     cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
                     cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
+                    cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
                     cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
                     python3 /root/adjust_mongod_config.py
               runcmd:
