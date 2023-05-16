@@ -60,9 +60,6 @@ spec:
                   sudo: ALL=(ALL) NOPASSWD:ALL
               hostname: mongodb-vm
               package_upgrade: true
-              bootcmd:
-                - "mkdir /mnt/mongodb-cert-tls"
-                - "mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls"
               write_files:
                 - path: /etc/yum.repos.d/mongodb-org-6.0.repo
                   content: |
@@ -100,16 +97,11 @@ spec:
                     cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
                     python3 /root/adjust_mongod_config.py
               runcmd:
-                - dnf install -y epel-release
-                - yum install -y mongodb-org
-                - dnf install -y python3 python3-pip
+                - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
+                - dnf install -y epel-release mongodb-org
                 - pip3 install ruamel.yaml
-                - systemctl daemon-reload
-                - sleep 10
-                - chmod +x /root/adjust_config_mongo.sh
-                - sh /root/adjust_config_mongo.sh
-                - systemctl restart mongod.service
-                - sleep 10
+                - chmod +x /root/adjust_config_mongo.sh && sh /root/adjust_config_mongo.sh
+                - systemctl daemon-reload && sleep 10 && systemctl restart mongod.service && sleep 10
                 - mongosh < /root/init-mongo.js
         - name: mongodb-data
           persistentVolumeClaim:
