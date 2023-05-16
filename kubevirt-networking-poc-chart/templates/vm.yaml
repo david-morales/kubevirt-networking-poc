@@ -98,7 +98,7 @@ spec:
                     python3 /root/adjust_mongod_config.py
               runcmd:
                 - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
-                - dnf install -y epel-release mongodb-org
+                - dnf install -y epel-release mongodb-org python3 python3-pip
                 - pip3 install ruamel.yaml
                 - chmod +x /root/adjust_config_mongo.sh && sh /root/adjust_config_mongo.sh
                 - systemctl daemon-reload && sleep 10 && systemctl restart mongod.service && sleep 10
