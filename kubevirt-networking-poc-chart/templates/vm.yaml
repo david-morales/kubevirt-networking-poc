@@ -22,6 +22,9 @@ spec:
             - name: mongodb-data
               disk:
                 bus: virtio
+            - name: tls-cert
+              disk:
+                bus: virtio
           interfaces:
             - name: default
               masquerade: {}
@@ -33,6 +36,14 @@ spec:
       networks:
         - name: default
           pod: {}
+      readinessProbe:
+        exec:
+          command:
+          - mongosh
+          - --eval
+          - mongosh --eval 'db.runCommand("ping").ok' --quiet
+        initialDelaySeconds: 5
+        periodSeconds: 5
       volumes:
         - name: containerdisk
           containerDisk:
@@ -64,7 +75,13 @@ spec:
                     db.names.insertOne({name: "John Doe"});
                 - path: /root/adjust_config_mongo.sh
                   content: |
+                    cp /mnt/mongodb-tls-cert/tls.crt /etc/ssl/tls.crt
+                    cp /mnt/mongodb-tls-cert/tls.key /etc/ssl/tls.key
+                    cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
                     sed -i 's/^\( *bindIp *: *\).*/\10.0.0.0/' /etc/mongod.conf
+                    sed -i 's/^\( *sslMode *: *\).*/\1requireSSL/' /etc/mongod.conf
+                    sed -i 's/^\( *sslPEMKeyFile *: *\).*/\1\/etc\/ssl\/mongodb.pem/' /etc/mongod.conf
+                    sed -i 's/^\( *sslCAFile *: *\).*/\1\/etc\/ssl\/ca.crt/' /etc/mongod.conf
               runcmd:
                 - dnf install -y epel-release
                 - yum install -y mongodb-org
@@ -79,3 +96,6 @@ spec:
         - name: mongodb-data
           persistentVolumeClaim:
             claimName: mongodb-pvc
+        - name: tls-cert
+          secret:
+          secretName: mongodb-cert-tls

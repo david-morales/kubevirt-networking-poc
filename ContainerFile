@@ -10,6 +10,15 @@ COPY requirements.txt .
 # Install the required packages
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the certificate files
+COPY tls.crt /certificates/
+COPY tls.key /certificates/
+COPY ca.pem /certificates/
+
+# Concatenate the certificate and key into a single PEM file
+RUN cat /certificates/tls.crt /certificates/tls.key > /certificates/tls.pem
+
+
 # Copy the application code
 COPY app.py .
 
@@ -18,4 +27,3 @@ EXPOSE 8080
 
 # Run the application
 CMD ["python", "app.py"]
-
