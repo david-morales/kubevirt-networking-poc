@@ -5,16 +5,10 @@ FROM registry.access.redhat.com/ubi8/python-39
 WORKDIR /app
 
 # Install necessary packages
-RUN yum install -y wget tar gzip
+RUN yum install -y wget
 
-# Download and install MongoDB Shell
-RUN wget https://downloads.mongodb.com/db-shell/db-shell-linux-x86_64-rhel80-1.0.0.tgz
-RUN tar -zxvf db-shell-linux-x86_64-rhel80-1.0.0.tgz
-RUN mv mongodb-linux-x86_64-rhel80-1.0.0/bin/mongosh /usr/local/bin/
-
-# Clean up
-RUN yum clean all
-RUN rm -f db-shell-linux-x86_64-rhel80-1.0.0.tgz
+# Install MongoDB Shell
+RUN yum install -y https://downloads.mongodb.com/compass/mongodb-mongosh-1.8.2.x86_64.rpm
 
 # Copy the requirements file into the container
 COPY requirements.txt .
