@@ -8,6 +8,7 @@ spec:
   dnsNames:
   - mongodb.{{ .Values.namespace }}.svc.cluster.local
   - mongodb-vm
+  - mongodb
   issuerRef:
     name: selfsigned-issuer
     kind: ClusterIssuer
