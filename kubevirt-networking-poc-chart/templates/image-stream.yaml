@@ -6,3 +6,5 @@ metadata:
 spec:
   tags:
   - name: latest
+    referencePolicy:
+      type: Source
