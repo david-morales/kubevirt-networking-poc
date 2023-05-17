@@ -16,6 +16,7 @@ spec:
       containers:
         - name: {{ .Values.namespace }}
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           volumeMounts:
