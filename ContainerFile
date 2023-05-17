@@ -1,20 +1,20 @@
-# Use the official Python base image
+# Use Python 3.9 on UBI 8 as a parent image
 FROM registry.access.redhat.com/ubi8/python-39
 
-# Install curl, gnupg and netcat
-RUN yum -y update && yum -y install curl gnupg2 nmap-ncat
-
-# Add MongoDB public key and list file
-RUN curl https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --import
-
-# Create a repo file for MongoDB
-RUN echo -e "[mongodb-org-6.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/\$releasever/mongodb-org/6.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc" > /etc/yum.repos.d/mongodb-org-6.0.repo
-
-# Install MongoDB shell
-RUN yum -y install mongodb-org-shell
-
-# Set the working directory
+# Set the working directory in the container to /app
 WORKDIR /app
+
+# Install necessary packages
+RUN yum install -y wget tar gzip
+
+# Download and install MongoDB Shell
+RUN wget https://downloads.mongodb.com/db-shell/db-shell-linux-x86_64-rhel80-1.0.0.tgz
+RUN tar -zxvf db-shell-linux-x86_64-rhel80-1.0.0.tgz
+RUN mv mongodb-linux-x86_64-rhel80-1.0.0/bin/mongosh /usr/local/bin/
+
+# Clean up
+RUN yum clean all
+RUN rm -f db-shell-linux-x86_64-rhel80-1.0.0.tgz
 
 # Copy the requirements file into the container
 COPY requirements.txt .
