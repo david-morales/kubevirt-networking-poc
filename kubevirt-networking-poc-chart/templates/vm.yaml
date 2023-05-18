@@ -36,22 +36,6 @@ spec:
       networks:
         - name: default
           pod: {}
-      livenessProbe:
-        exec:
-          command:
-          - mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017 --eval 'db.adminCommand("ping")'
-        initialDelaySeconds: 60
-        failureThreshold: 10
-        periodSeconds: 15
-        timeoutSeconds: 10
-      readinessProbe:
-        exec:
-          command:
-          - mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017 --eval 'db.adminCommand("ping")'
-        initialDelaySeconds: 60
-        failureThreshold: 10
-        periodSeconds: 15
-        timeoutSeconds: 10
       volumes:
         - name: containerdisk
           containerDisk:
