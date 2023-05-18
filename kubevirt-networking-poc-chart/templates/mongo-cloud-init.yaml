@@ -33,6 +33,13 @@ stringData:
           if 'net' not in config:
               config['net'] = {}
           config['net']['bindIp'] = '0.0.0.0'
+          if 'tls' not in config['net']:
+              config['net']['tls'] = {}
+          config['net']['tls']['mode'] = 'requireTLS'
+          config['net']['tls']['certificateKeyFile'] = '/etc/ssl/mongodb.pem'
+          config['net']['tls']['CAFile'] = '/etc/ssl/ca.crt'
+          with open('/etc/mongod.conf', 'w') as file:
+              yaml.dump(config, file)
           with open('/etc/mongod.conf', 'w') as file:
               yaml.dump(config, file)
       - path: /root/init-mongo.js
@@ -58,4 +65,4 @@ stringData:
       - sleep 10
       - systemctl restart mongod.service
       - sleep 10
-      - mongosh < /root/init-mongo.js
+      - mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017 < /root/init-mongo.js
