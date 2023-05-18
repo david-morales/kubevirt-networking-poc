@@ -7,7 +7,7 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: kubevirt-networking-poc:latest
+      name: {{ .Values.namespace }}:latest
   source:
     git:
       ref: cert-manager
