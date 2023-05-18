@@ -15,10 +15,12 @@ def welcome():
             pem_file.write(key_file.read())
 
     # Use the concatenated certificate and key file in the MongoClient connection
-    client = MongoClient('mongodb', 27017, 
-                            tls=True, 
-                            tlsCertificateKeyFile=pem_file_path, 
-                            tlsCAFile='/certificates/ca.crt')
+    client = MongoClient('mongodb', 27017
+                            #, 
+                            #tls=True, 
+                            #tlsCertificateKeyFile=pem_file_path, 
+                            #tlsCAFile='/certificates/ca.crt'
+                            )
     db = client['demo']
     collection = db['names']
     name = collection.find_one()['name']

@@ -22,9 +22,6 @@ spec:
             - name: mongodb-data
               disk:
                 bus: virtio
-            - disk: {}
-              name: secret-disk
-              serial: SERIAL
           interfaces:
             - name: default
               masquerade: {}
@@ -36,25 +33,49 @@ spec:
       networks:
         - name: default
           pod: {}
-      readinessProbe:
-        exec:
-          command:
-          - mongosh
-          - --eval
-          - mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017 --eval 'db.runCommand("ping").ok' --quiet
-        initialDelaySeconds: 5
-        periodSeconds: 5
       volumes:
         - name: containerdisk
           containerDisk:
             image: "{{ .Values.vm.imageName }}:{{ .Values.vm.imageTag }}"
         - name: cloudinitdisk
           cloudInitNoCloud:
-            secretRef:
-              name: mongodb-vm-userdata
+            userData: |
+              #cloud-config
+              users:
+                - name: neo
+                  plain_text_passwd: 'neo'
+                  lock_passwd: false
+                  groups: users, admin
+                  sudo: ALL=(ALL) NOPASSWD:ALL
+              hostname: mongodb-vm
+              package_upgrade: true
+              write_files:
+                - path: /etc/yum.repos.d/mongodb-org-6.0.repo
+                  content: |
+                    [mongodb-org-6.0]
+                    name=MongoDB Repository
+                    baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/6.0/x86_64/
+                    gpgcheck=1
+                    enabled=1
+                    gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
+                - path: /root/init-mongo.js
+                  content: |
+                    db = new Mongo().getDB("demo");
+                    db.names.insertOne({name: "John Doe"});
+                - path: /root/adjust_config_mongo.sh
+                  content: |
+                    sed -i 's/^\( *bindIp *: *\).*/\10.0.0.0/' /etc/mongod.conf
+              runcmd:
+                - dnf install -y epel-release
+                - yum install -y mongodb-org
+                - systemctl daemon-reload
+                - systemctl enable --now mongod.service
+                - sleep 10
+                - chmod +x /root/adjust_config_mongo.sh
+                - sh /root/adjust_config_mongo.sh
+                - systemctl restart mongod.service
+                - sleep 10
+                - mongosh < /root/init-mongo.js
         - name: mongodb-data
           persistentVolumeClaim:
             claimName: mongodb-pvc
-        - secret:
-            secretName: mongodb-cert-tls
-          name: secret-disk
