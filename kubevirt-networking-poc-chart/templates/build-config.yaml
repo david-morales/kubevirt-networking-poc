@@ -2,7 +2,7 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   name: kubevirt-networking-poc-bc
-  namespace: kubevirt-networking-poc
+  namespace: {{ .Values.namespace }}
 spec:
   output:
     to:
