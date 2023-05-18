@@ -16,17 +16,8 @@ spec:
       containers:
         - name: {{ .Values.namespace }}
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
-          imagePullPolicy: Always
           ports:
             - containerPort: 8080
-          volumeMounts:
-            - name: mongodb-cert
-              mountPath: /certificates
-              readOnly: true
-      volumes:
-        - name: mongodb-cert
-          secret:
-            secretName: mongodb-cert-tls
 ---
 apiVersion: v1
 kind: Service
@@ -40,4 +31,3 @@ spec:
       targetPort: 8080
   selector:
     app: {{ .Values.namespace }}
-

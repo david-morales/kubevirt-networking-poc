@@ -2,12 +2,12 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   name: kubevirt-networking-poc-bc
-  namespace:  {{ .Values.namespace }}
+  namespace: kubevirt-networking-poc
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name:  {{ .Values.namespace }}:latest
+      name: kubevirt-networking-poc:latest
   source:
     git:
       ref: cert-manager

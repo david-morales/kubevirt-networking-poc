@@ -1,14 +1,8 @@
-# Use Python 3.9 on UBI 8 as a parent image
-FROM registry.access.redhat.com/ubi8/python-39
+# Use the official Python base image
+FROM python:3.9-slim
 
-# Set the working directory in the container to /app
+# Set the working directory
 WORKDIR /app
-
-# Install necessary packages
-RUN yum install -y wget
-
-# Install MongoDB Shell
-RUN yum install -y https://downloads.mongodb.com/compass/mongodb-mongosh-1.8.2.x86_64.rpm
 
 # Copy the requirements file into the container
 COPY requirements.txt .
