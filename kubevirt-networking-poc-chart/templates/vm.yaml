@@ -43,7 +43,6 @@ spec:
         initialDelaySeconds: 60
         failureThreshold: 10
         periodSeconds: 15
-        successThreshold: 3
         timeoutSeconds: 10
       readinessProbe:
         exec:
@@ -52,7 +51,6 @@ spec:
         initialDelaySeconds: 60
         failureThreshold: 10
         periodSeconds: 15
-        successThreshold: 3
         timeoutSeconds: 10
       volumes:
         - name: containerdisk
