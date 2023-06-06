@@ -40,7 +40,7 @@ stringData:
                 become: yes
               {{- $root := . -}}
               {{- range $i := until (int $root.Values.mongodb.replicas) }}
-              {{- if ne $root.Values.mongodb.master $i }}
+              {{- if ne $root.Values.mongodb.master (float64 $i) }}
               - name: Add VM{{ $i }} to MongoDB replica set
                 command: >
                   mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
