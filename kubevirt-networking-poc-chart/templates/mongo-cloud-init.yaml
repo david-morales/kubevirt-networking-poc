@@ -31,30 +31,32 @@ stringData:
                 replSetName: rs0
             roles:
               - mongodb.community
+          - hosts: localhost
             tasks:
               - name: Initiate MongoDB replica set
                 command: >
                   mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
-                  --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongodb-vm-{{ .Values.mongodb.master }}:27017"}]})'
+                  --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongodb-vm-{{ .Values.replicaset.master }}:27017"}]})'
                 become: yes
-                when: ansible_hostname == "mongodb-vm-{{ .Values.mongodb.master }}"
-              - name: Add remaining VMs to MongoDB replica set
-                loop: "{{ range(1, .Values.mongodb.replicas) }}"
+              {{- range $i := until .Values.replicaset.size }}
+              {{- if ne .Values.replicaset.master $i }}
+              - name: Add VM{{ $i }} to MongoDB replica set
                 command: >
                   mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
-                  --eval 'rs.add({_id: {{ loop.index }}, host: "mongodb-vm-{{ loop.index }}:27017"})'
+                  --eval 'rs.add({_id: {{ add $i 1 }}, host: "{{ printf "mongodb-vm-%d:27017" $i }}"})'
                 become: yes
-                when: ansible_hostname == "mongodb-vm-{{ .Values.mongodb.master }}"
+              {{- end }}
+              {{- end }}
         path: /root/mongodb_replica_setup.yml
     ansible:
       playbook:
         - /root/mongodb_replica_setup.yml
       roles:
         - name: mongodb.community
-        src: https://galaxy.ansible.com/mongodb/community
-  runcmd:
-    - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
-    - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
-    - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
-    - cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
-    - cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
+          src: https://galaxy.ansible.com/mongodb/community
+    runcmd:
+      - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
+      - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
+      - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
+      - cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
+      - cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
