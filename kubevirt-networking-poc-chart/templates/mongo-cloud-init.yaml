@@ -36,10 +36,10 @@ stringData:
               - name: Initiate MongoDB replica set
                 command: >
                   mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
-                  --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongodb-vm-{{ .Values.replicaset.master }}:27017"}]})'
+                  --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongodb-vm-{{ .Values.mongodb.master }}:27017"}]})'
                 become: yes
-              {{- range $i := until .Values.replicaset.size }}
-              {{- if ne .Values.replicaset.master $i }}
+              {{- range $i := until .Values.mongodb.replicas }}
+              {{- if ne .Values.mongodb.master $i }}
               - name: Add VM{{ $i }} to MongoDB replica set
                 command: >
                   mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
