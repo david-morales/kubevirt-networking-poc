@@ -50,11 +50,10 @@ stringData:
               {{- end }}
         path: /root/mongodb_replica_setup.yml
     ansible:
-      playbook:
-        - /root/mongodb_replica_setup.yml
-      roles:
-        - name: mongodb.community
-          src: https://galaxy.ansible.com/mongodb/community
+      install_method: distro
+      run_user: neo
+      run_ansible:
+        - playbook_name: /root/mongodb_replica_setup.yml
     runcmd:
       - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
       - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
