@@ -41,7 +41,7 @@ spec:
       volumes:
         - name: containerdisk
           containerDisk:
-            image: "{{ .Values.vm.imageName }}:{{ .Values.vm.imageTag }}"
+            image: "{{ $root.Values.vm.imageName }}:{{ $root.Values.vm.imageTag }}"
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:
