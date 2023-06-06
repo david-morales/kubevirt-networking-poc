@@ -11,3 +11,7 @@ app:
 vm:
   imageName: quay.io/containerdisks/centos-stream
   imageTag: 9
+
+mongodb:
+  replicas: 3
+  master: 0

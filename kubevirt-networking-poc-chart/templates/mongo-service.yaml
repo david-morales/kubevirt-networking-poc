@@ -1,7 +1,8 @@
+{{- range $i := until (int .Values.mongodb.replicas) }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongodb
+  name: mongodb-{{ $i }}
   namespace: {{ .Values.namespace }}
 spec:
   ports:
@@ -11,3 +12,4 @@ spec:
     targetPort: 27017
   selector:
     kubevirt.io/domain: mongodb-vm
+{{- end }}

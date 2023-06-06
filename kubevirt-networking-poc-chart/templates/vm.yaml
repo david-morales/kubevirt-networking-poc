@@ -1,7 +1,8 @@
+{{- range $i := until (int .Values.mongodb.replicas) }}
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: mongodb-vm
+  name: mongodb-vm-{{ $i }}
   namespace: {{ .Values.namespace }}
 spec:
   running: true
@@ -46,7 +47,8 @@ spec:
               name: mongodb-vm-userdata
         - name: mongodb-data
           persistentVolumeClaim:
-            claimName: mongodb-pvc
+            claimName: mongodb-pvc-{{ $i }}
         - secret:
             secretName: mongodb-cert-tls
           name: secret-disk
+{{- end }}

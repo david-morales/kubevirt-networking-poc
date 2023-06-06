@@ -16,53 +16,45 @@ stringData:
     hostname: mongodb-vm
     package_upgrade: true
     write_files:
-      - path: /etc/yum.repos.d/mongodb-org-6.0.repo
-        content: |
-          [mongodb-org-6.0]
-          name=MongoDB Repository
-          baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/6.0/x86_64/
-          gpgcheck=1
-          enabled=1
-          gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
-      - path: /root/adjust_mongod_config.py
-        content: |
-          import ruamel.yaml
-          yaml = ruamel.yaml.YAML()
-          with open('/etc/mongod.conf', 'r') as file:
-              config = yaml.load(file)
-          if 'net' not in config:
-              config['net'] = {}
-          config['net']['bindIp'] = '0.0.0.0'
-          if 'tls' not in config['net']:
-              config['net']['tls'] = {}
-          config['net']['tls']['mode'] = 'requireTLS'
-          config['net']['tls']['certificateKeyFile'] = '/etc/ssl/mongodb.pem'
-          config['net']['tls']['CAFile'] = '/etc/ssl/ca.crt'
-          with open('/etc/mongod.conf', 'w') as file:
-              yaml.dump(config, file)
-          with open('/etc/mongod.conf', 'w') as file:
-              yaml.dump(config, file)
-      - path: /root/init-mongo.js
-        content: |
-          db = db.getSiblingDB('demo');
-          db.names.insertOne({name: "John Doe"});
-      - path: /root/adjust_config_mongo.sh
-        content: |
-          cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
-          cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
-          cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
-          cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
-          python3 /root/adjust_mongod_config.py
-    runcmd:
-      - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
-      - dnf install -y epel-release python3 python3-pip
-      - yum install -y mongodb-org
-      - pip3 install ruamel.yaml
-      - systemctl daemon-reload
-      - chmod +x /root/adjust_config_mongo.sh
-      - sh /root/adjust_config_mongo.sh
-      - systemctl enable --now mongod.service
-      - sleep 10
-      - systemctl restart mongod.service
-      - sleep 10
-      - mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017 < /root/init-mongo.js
+      - content: |
+          - hosts: localhost
+            vars:
+              mongodb_package: mongodb-org
+              mongodb_repository: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/6.0/x86_64/
+              mongodb_enable_authentication: no
+              mongodb_net_bindip: 0.0.0.0
+              mongodb_net_tls:
+                mode: requireTLS
+                certificateKeyFile: /etc/ssl/mongodb.pem
+                CAFile: /etc/ssl/ca.crt
+              mongodb_replication:
+                replSetName: rs0
+            roles:
+              - mongodb.community
+            tasks:
+              - name: Initiate MongoDB replica set
+                command: >
+                  mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
+                  --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongodb-vm-{{ .Values.mongodb.master }}:27017"}]})'
+                become: yes
+                when: ansible_hostname == "mongodb-vm-{{ .Values.mongodb.master }}"
+              - name: Add remaining VMs to MongoDB replica set
+                loop: "{{ range(1, .Values.mongodb.replicas) }}"
+                command: >
+                  mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
+                  --eval 'rs.add({_id: {{ loop.index }}, host: "mongodb-vm-{{ loop.index }}:27017"})'
+                become: yes
+                when: ansible_hostname == "mongodb-vm-{{ .Values.mongodb.master }}"
+        path: /root/mongodb_replica_setup.yml
+    ansible:
+      playbook:
+        - /root/mongodb_replica_setup.yml
+      roles:
+        - name: mongodb.community
+        src: https://galaxy.ansible.com/mongodb/community
+  runcmd:
+    - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
+    - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
+    - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
+    - cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
+    - cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
