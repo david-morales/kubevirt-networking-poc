@@ -1,9 +1,10 @@
-{{- range $i := until (int .Values.mongodb.replicas) }}
+{{- $root := . -}}
+{{- range $i := until (int $root.Values.mongodb.replicas) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongodb-pvc-{{ $i }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ $root.Values.namespace }}
 spec:
   accessModes:
     - ReadWriteOnce
