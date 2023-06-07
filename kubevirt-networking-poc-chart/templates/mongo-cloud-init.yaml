@@ -19,40 +19,30 @@ stringData:
       - content: |
           - hosts: localhost
             vars:
-              mongodb_package: mongodb-org
+              config_port: 27017
               mongodb_repository: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/6.0/x86_64/
-              mongodb_enable_authentication: no
-              mongodb_net_bindip: 0.0.0.0
-              mongodb_net_tls:
-                mode: requireTLS
-                certificateKeyFile: /etc/ssl/mongodb.pem
-                CAFile: /etc/ssl/ca.crt
-              mongodb_replication:
-                replSetName: rs0
+              bind_ip: 0.0.0.0
+              authorization: disabled
+              mongodb_use_tls: true
+              mongodb_certificate_key_file: /etc/ssl/mongodb.pem
+              mongodb_certificate_ca_file: /etc/ssl/ca.crt
             roles:
-              - mongodb.community
-          - hosts: localhost
-            tasks:
-              - name: Initiate MongoDB replica set
-                command: >
-                  mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
-                  --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongodb-vm-{{ $.Values.mongodb.master }}:27017"}]})'
-                become: yes
-              {{- $root := . -}}
-              {{- range $i := until (int $root.Values.mongodb.replicas) }}
-              {{- if ne $root.Values.mongodb.master (float64 $i) }}
-              - name: Add VM{{ $i }} to MongoDB replica set
-                command: >
-                  mongosh --tls --tlsCAFile /etc/ssl/ca.crt --tlsCertificateKeyFile /etc/ssl/mongodb.pem --host mongodb-vm --port 27017
-                  --eval 'rs.add({_id: {{ add $i 1 }}, host: "{{ printf "mongodb-vm-%d:27017" $i }}"})'
-                become: yes
-              {{- end }}
-              {{- end }}
+              - community.mongodb.mongodb_repository
+              - community.mongodb.mongodb_install
+              - community.mongodb.mongodb_config
+              - community.mongodb.mongodb_mongod
         path: /root/mongodb_replica_setup.yml
     ansible:
       package_name: ansible-core
       install_method: distro
       run_user: neo
+      setup_controller:
+        repositories:
+          - path: /root
+            source: https://github.com/ansible/ansible
+      galaxy:
+        actions:
+          - ['install', 'community.mongodb']
       run_ansible:
         - playbook_name: /root/mongodb_replica_setup.yml
     runcmd:
