@@ -19,20 +19,29 @@ stringData:
       - content: |
           - hosts: localhost
             vars:
-              config_port: 27017
-              mongodb_repository: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/6.0/x86_64/
-              bind_ip: 0.0.0.0
-              authorization: disabled
+              replicaset_name: rs0
               mongodb_use_tls: true
               mongodb_certificate_key_file: /etc/ssl/mongodb.pem
               mongodb_certificate_ca_file: /etc/ssl/ca.crt
-              skip_restart: false
-            roles:
-              - community.mongodb.mongodb_repository
-              - community.mongodb.mongodb_install
-              - community.mongodb.mongodb_config
-              - community.mongodb.mongodb_mongod
-        path: /root/mongodb_replica_setup.yml
+              replicaset_members:
+                - mongodb-vm-0
+                - mongodb-vm-1
+                - mongodb-vm-2
+            tasks:
+              - name: Ensure pymongo is installed
+                ansible.builtin.pip:
+                  name: pymongo
+                  version: '>=3.6.0'
+              - name: Ensure replicaset "rs0" exists
+                community.mongodb.mongodb_replicaset:
+                  login_host: localhost
+                  login_port: 27017
+                  replica_set: "{{ replicaset_name }}"
+                  members: "{{ replicaset_members }}"
+                  ssl: true
+                  ssl_certfile: "{{ mongodb_certificate_key_file }}"
+                  ssl_ca_certs: "{{ mongodb_certificate_ca_file }}"
+        path: /root/mongodb_replicaset_setup.yml
       - content: |
           #!/bin/bash
           ansible-galaxy collection install community.mongodb
