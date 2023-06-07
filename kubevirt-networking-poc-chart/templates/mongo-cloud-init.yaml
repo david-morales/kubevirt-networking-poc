@@ -51,4 +51,3 @@ stringData:
           - ['install', 'community.mongodb']
       run_ansible:
         - playbook_name: /root/mongodb_replica_setup.yml
-        playbook_dir: /root
