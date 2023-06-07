@@ -50,6 +50,7 @@ stringData:
               {{- end }}
         path: /root/mongodb_replica_setup.yml
     ansible:
+      package_name: ansible-core
       install_method: distro
       run_user: neo
       run_ansible:
