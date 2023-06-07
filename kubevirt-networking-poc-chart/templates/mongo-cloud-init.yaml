@@ -32,6 +32,12 @@ stringData:
               - community.mongodb.mongodb_config
               - community.mongodb.mongodb_mongod
         path: /root/mongodb_replica_setup.yml
+    runcmd:
+      - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
+      - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
+      - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
+      - cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
+      - cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
     ansible:
       package_name: ansible-core
       install_method: distro
@@ -45,9 +51,4 @@ stringData:
           - ['install', 'community.mongodb']
       run_ansible:
         - playbook_name: /root/mongodb_replica_setup.yml
-    runcmd:
-      - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
-      - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
-      - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
-      - cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
-      - cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
+        playbook_dir: /root
