@@ -42,12 +42,12 @@ stringData:
               community.mongodb.mongodb_replicaset:
                 login_host: mongodb-vm-2
                 login_port: 27017
-                replica_set: "{{ replicaset_name }}"
+                replica_set: '{{ "{{ replicaset_name }}" }}'
                 members:
                   - mongodb-vm-2:27017
                 ssl: true
-                ssl_certfile: "{{ mongodb_certificate_key_file }}"
-                ssl_ca_certs: "{{ mongodb_certificate_ca_file }}"
+                ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
+                ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
                 validate: false
               when: ansible_hostname == "mongodb-vm-2"
             - name: Wait for the replicaset to stabilise
@@ -55,9 +55,9 @@ stringData:
                 login_host: mongodb-vm-2
                 login_port: 27017
                 ssl: true
-                ssl_certfile: "{{ mongodb_certificate_key_file }}"
-                ssl_ca_certs: "{{ mongodb_certificate_ca_file }}"
-                replica_set: "{{ replicaset_name }}"
+                ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
+                ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
+                replica_set: '{{ "{{ replicaset_name }}" }}'
                 poll: 5
                 interval: 10
                 validate: false
@@ -68,9 +68,9 @@ stringData:
                 login_host: mongodb-vm-2
                 login_port: 27017
                 ssl: true
-                ssl_certfile: "{{ mongodb_certificate_key_file }}"
-                ssl_ca_certs: "{{ mongodb_certificate_ca_file }}"
-                replica_set: "{{ replicaset_name }}"
+                ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
+                ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
+                replica_set: '{{ "{{ replicaset_name }}" }}'
                 reconfigure: yes
                 members:
                   - host: mongodb-vm-0:27017
@@ -80,9 +80,9 @@ stringData:
                 login_host: mongodb-vm-2
                 login_port: 27017
                 ssl: true
-                ssl_certfile: "{{ mongodb_certificate_key_file }}"
-                ssl_ca_certs: "{{ mongodb_certificate_ca_file }}"
-                replica_set: "{{ replicaset_name }}"
+                ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
+                ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
+                replica_set: '{{ "{{ replicaset_name }}" }}'
                 reconfigure: yes
                 members:
                   - host: mongodb-vm-1:27017
@@ -92,9 +92,9 @@ stringData:
                 login_host: mongodb-vm-2
                 login_port: 27017
                 ssl: true
-                ssl_certfile: "{{ mongodb_certificate_key_file }}"
-                ssl_ca_certs: "{{ mongodb_certificate_ca_file }}"
-                replica_set: "{{ replicaset_name }}"
+                ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
+                ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
+                replica_set: '{{ "{{ replicaset_name }}" }}'
                 poll: 5
                 interval: 10
                 validate: minimal
