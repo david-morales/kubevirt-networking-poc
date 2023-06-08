@@ -35,6 +35,15 @@ stringData:
               - community.mongodb.mongodb_config
               - community.mongodb.mongodb_mongod
             tasks:
+              - name: install python-setuptools
+                package:
+                  name: python-setuptools
+                  state: latest
+                  update_cache: yes
+              - name: install python-pip
+                package:
+                  name: python-pip
+                  state: latest
               - name: Ensure pymongo is installed
                 pip:
                   name: pymongo>2.4.2
