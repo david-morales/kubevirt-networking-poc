@@ -21,17 +21,14 @@ stringData:
               - name: Include Ansible vars
                 include_vars:
                   file: /mnt/ansible-vars/ansible_vars.yml
-              - name: Generate members list
+              - name: Generate list of mongodb hosts
                 set_fact:
-                  members_list: >-
-                    {%- set result = [] -%}
-                    {%- for i in range(replicaset_size) -%}
-                      {%- set _ = result.append('mongodb-' ~ i ~ '.' ~ namespace ~ '.svc.cluster.local:' ~ config_port) -%}
-                    {%- endfor -%}
-                    '{{ "{{ result }}" }}'
-              - name: Convert members_list to correct format
+                  mongodb_list: '{{ "{{ mongodb_list|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017'] }}" }}'
+                loop: '{{ "{{ range(0, replicaset_size)|list }}" }}'
+                
+              - name: Convert mongodb list to csv string
                 set_fact:
-                  members_string: '{{ "{{ members_list | join(\",\") }}" }}'
+                  mongodb_csv:'{{ "{{ mongodb_list|join(',') }}" }}'
             roles:
               - community.mongodb.mongodb_repository
               - community.mongodb.mongodb_install
@@ -68,7 +65,7 @@ stringData:
                   ssl: true
                   ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
                   ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
-                  replica_set: '{{ "{{ replicaset_name }}" }}'
+                  replica_set: '{{ "{{ mongodb_csv }}" }}'
                   poll: 5
                   interval: 10
                   validate: minimal
