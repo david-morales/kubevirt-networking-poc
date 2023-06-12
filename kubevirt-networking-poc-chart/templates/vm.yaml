@@ -23,7 +23,7 @@ spec:
             - name: mongodb-data
               disk:
                 bus: virtio
-            - disk: {}
+            - disk:
               name: secret-disk
               serial: SERIAL
             - disk:
