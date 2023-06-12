@@ -57,8 +57,8 @@ stringData:
                   ssl: true
                   ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
                   ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
-                  replica_set: '{{ "{{ replicaset_name }}" }}'                  
-                  members: '{{ "{{ members_string.split(',') }}" }}'                    
+                  replica_set: '{{ "{{ replicaset_name }}" }}'                 
+                  members: {{ "{{" }} members_string.split(',') {{ "}}" }}                
                   validate: no
                 when: ansible_hostname is search("-0")               
               - name: Wait for the replicaset to stabilise
