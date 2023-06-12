@@ -79,7 +79,7 @@ stringData:
       run_user: neo
     runcmd:
       - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep 1SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
-      - mkdir -p /mnt/ansible-vars && mount /dev/$(lsblk --nodeps -no name,serial | grep 2sSERIALANSIBLEVARS | cut -f1 -d' ') /mnt/ansible-vars
+      - mkdir -p /mnt/ansible-vars && mount /dev/$(lsblk --nodeps -no name,serial | grep 2SERIALANSIBLEVARS | cut -f1 -d' ') /mnt/ansible-vars
       - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
       - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
       - cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
