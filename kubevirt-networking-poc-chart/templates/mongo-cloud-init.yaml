@@ -21,7 +21,7 @@ stringData:
             pre_tasks:
               - name: Include Ansible vars
                 include_vars:
-                  file: /mnt/ansible-vars/mongo-ansible_vars.yml
+                  file: /mnt/ansible-vars/ansible_vars.yml
             roles:
               - community.mongodb.mongodb_repository
               - community.mongodb.mongodb_install
