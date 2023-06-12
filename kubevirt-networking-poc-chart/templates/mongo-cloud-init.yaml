@@ -21,14 +21,6 @@ stringData:
               - name: Include Ansible vars
                 include_vars:
                   file: /mnt/ansible-vars/ansible_vars.yml
-              - name: Generate list of mongodb hosts
-                set_fact:
-                  mongodb_list: '{{ "{{ mongodb_list|default([]) + [\"mongodb-\" + (item|string) + \".\" + namespace + \".svc.cluster.local:27017\"] }}" }}'
-                loop: '{{ "{{ range(0, replicaset_size)|list }}" }}'
-                
-              - name: Convert mongodb list to csv string
-                set_fact:
-                  mongodb_csv:'{{ "{{ mongodb_list|join(',') }}" }}'
             roles:
               - community.mongodb.mongodb_repository
               - community.mongodb.mongodb_install
@@ -47,6 +39,10 @@ stringData:
                 pip:
                   name: pymongo>2.4.2
                   state: present
+              - name: Generate CSV string of mongodb hosts
+                set_fact:
+                  mongodb_csv: "{{ '{{' }} mongodb_csv|default('') + (mongodb_csv|default('') != '' | ternary(',', '') ) + 'mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017' }}"
+                loop: "{{ '{{' }} range(0, replicaset_size)|list {{ '}}' }}"
               - name: Ensure replicaset exists
                 community.mongodb.mongodb_replicaset:
                   login_host: 'mongodb-0.{{ "{{" }} namespace {{ "}}" }}.svc.cluster.local'
