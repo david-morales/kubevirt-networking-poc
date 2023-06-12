@@ -41,8 +41,8 @@ stringData:
                   state: present
               - name: Generate CSV string of mongodb hosts
                 set_fact:
-                  mongodb_csv: '{{ "{{ mongodb_csv|default('') + (mongodb_csv|default('') != '' | ternary(',', '') ) + 'mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017' }}" }}'
-                loop: '{{ "{{ range(0, replicaset_size)|list }}" }}'
+                  mongodb_csv: '{{ "{{" }} mongodb_csv|default("") + (mongodb_csv|default("") != "" | ternary(",", "") ) + "mongodb-" + (item|string) + "." + namespace + ".svc.cluster.local:27017" {{ "}}" }}'
+                loop: '{{ "{{" }} range(0, replicaset_size)|list {{ "}}" }}'
               - name: Ensure replicaset exists
                 community.mongodb.mongodb_replicaset:
                   login_host: 'mongodb-0.{{ "{{" }} namespace {{ "}}" }}.svc.cluster.local'
