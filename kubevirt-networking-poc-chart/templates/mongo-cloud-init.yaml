@@ -78,9 +78,10 @@ stringData:
       install_method: distro
       run_user: neo
     runcmd:
-      # mount the ConfigMap
-      - "mkdir /mnt/ansible-vars"
-      - "mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL-ANSIBLE-VARS | cut -f1 -d' ') /mnt/ansible-vars"
+      # mount ConfigMap
+      - mkdir /mnt/ansible-vars
+      - mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL-ANSIBLE-VARS | cut -f1 -d' ') /mnt/ansible-vars
+      # mount and setup Certificates
       - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
       - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
       - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
