@@ -6,6 +6,7 @@ metadata:
 type: Opaque
 stringData:
   userdata: |
+{{% raw %}}
     #cloud-config
     users:
       - name: neo
@@ -29,7 +30,7 @@ stringData:
               mongodb_certificate_ca_file: /etc/ssl/ca.crt
               skip_restart: false
               replicaset_name: rsneo
-              repl_set_name: '{{ ansible_replicaset_name }}'
+              repl_set_name: '{{ replicaset_name }}'
               replicaset: true
               master_host: mongodb-2.poc-certificates.svc.cluster.local
             roles:
@@ -52,28 +53,46 @@ stringData:
                   state: present
               - name: Ensure replicaset "rs0" exists
                 community.mongodb.mongodb_replicaset:
-                  login_host: '{{ ansible_master_host }}'
-                  login_port: '{{ ansible_config_port }}'
+                  login_host: '{{ master_host }}'
+                  login_port: '{{ config_port }}'
                   ssl: true
-                  ssl_certfile: '{{ ansible_mongodb_certificate_key_file }}'
-                  ssl_ca_certs: '{{ ansible_mongodb_certificate_ca_file }}'
-                  replica_set: '{{ ansible_replicaset_name }}'
+                  ssl_certfile: '{{ mongodb_certificate_key_file }}'
+                  ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
+                  replica_set: '{{ replicaset_name }}'
                   members:
-                    - "{{ ansible_master_host }}:{{ ansible_config_port }}"
-                    - "mongodb-0.poc-certificates.svc.cluster.local:{{ ansible_config_port }}"
-                    - "mongodb-1.poc-certificates.svc.cluster.local:{{ ansible_config_port }}"
+                    - "{{ master_host }}:{{ config_port }}"
+                    - "mongodb-0.poc-certificates.svc.cluster.local:{{ config_port }}"
+                    - "mongodb-1.poc-certificates.svc.cluster.local:{{ config_port }}"
                   validate: no
-                when: ansible_hostname == "mongodb-vm-2"               
+                when: ansible_hostname == "mongodb-vm-2"
               - name: Wait for the replicaset to stabilise
                 community.mongodb.mongodb_status:
-                  login_host: '{{ ansible_master_host }}'
-                  login_port: '{{ ansible_config_port }}'
+                  login_host: '{{ master_host }}'
+                  login_port: '{{ config_port }}'
                   ssl: true
-                  ssl_certfile: '{{ ansible_mongodb_certificate_key_file }}'
-                  ssl_ca_certs: '{{ ansible_mongodb_certificate_ca_file }}'
-                  replica_set: '{{ ansible_replicaset_name }}'
+                  ssl_certfile: '{{ mongodb_certificate_key_file }}'
+                  ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
+                  replica_set: '{{ replicaset_name }}'
                   poll: 5
                   interval: 10
                   validate: minimal
                 when: ansible_hostname == "mongodb-vm-2"
         path: /root/mongodb_replica_setup.yml
+      - content: |
+          #!/bin/bash
+          ansible-galaxy collection install community.mongodb
+          ansible-playbook /root/mongodb_replica_setup.yml
+        path: /root/run_ansible.sh
+        permissions: '0755'
+{{% endraw %}}
+    ansible:
+      package_name: ansible-core
+      install_method: distro
+      run_user: neo
+    runcmd:
+      - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
+      - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
+      - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
+      - cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt
+      - cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
+      - /root/run_ansible.sh
