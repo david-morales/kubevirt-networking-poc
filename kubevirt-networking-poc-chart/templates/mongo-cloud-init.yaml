@@ -50,7 +50,7 @@ stringData:
                   members:
                     {%- set ns = namespace -%}
                     {%- for i in range(replicaset_size) -%}
-                      - 'mongodb-{{ i }}.{{ ns }}.svc.cluster.local:{{ config_port }}'
+                      - 'mongodb-'{{ "{{ i }}" }}'.'{{ "{{ ns }}" }}'.svc.cluster.local:'{{ "{{ config_port }}" }}'
                     {%- endfor -%}
                   validate: no
                 when: ansible_hostname is search("-0")               
