@@ -23,7 +23,7 @@ stringData:
                   file: /mnt/ansible-vars/ansible_vars.yml
               - name: Generate list of mongodb hosts
                 set_fact:
-                  mongodb_list: '{{ "{{ mongodb_list|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017'] }}" }}'
+                  mongodb_list: '{{ "{{ mongodb_list|default([]) + ["mongodb-" + (item|string) + "." + namespace + ".svc.cluster.local:27017"] }}" }}'
                 loop: '{{ "{{ range(0, replicaset_size)|list }}" }}'
                 
               - name: Convert mongodb list to csv string
