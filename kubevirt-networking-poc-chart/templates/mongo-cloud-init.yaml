@@ -66,7 +66,7 @@ stringData:
                   ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
                   ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
                   replica_set: '{{ "{{ mongodb_csv }}" }}'
-                  poll: 5
+                  poll: 6
                   interval: 10
                   validate: minimal
                 when: ansible_hostname is search("-0")         
