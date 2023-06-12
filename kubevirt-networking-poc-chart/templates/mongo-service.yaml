@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongodb-{{ $i }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ $.Values.namespace }}
 spec:
   ports:
   - name: mongo
