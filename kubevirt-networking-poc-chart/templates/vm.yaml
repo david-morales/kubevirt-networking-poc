@@ -26,16 +26,13 @@ spec:
             - disk: {}
               name: secret-disk
               serial: SERIAL
-            - name: mongo-ansible-vars-disk
-              disk:
-                bus: virtio
+            - disk:
+              name: mongo-ansible-vars-disk
+              serial: SERIAL-ANSIBLE-VARS
           interfaces:
             - name: default
               masquerade: {}
               model: virtio
-          filesystems:
-            - name: mongo-ansible-vars-disk
-              virtiofs: {}
         resources:
           requests:
             memory: 2Gi
