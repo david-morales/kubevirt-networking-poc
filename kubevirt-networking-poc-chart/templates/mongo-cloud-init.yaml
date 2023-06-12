@@ -21,6 +21,17 @@ stringData:
               - name: Include Ansible vars
                 include_vars:
                   file: /mnt/ansible-vars/ansible_vars.yml
+              - name: Generate members list
+                set_fact:
+                  members_list: >-
+                    {%- set result = [] -%}
+                    {%- for i in range(replicaset_size) -%}
+                      {%- set _ = result.append('mongodb-' ~ i ~ '.' ~ namespace ~ '.svc.cluster.local:' ~ config_port) -%}
+                    {%- endfor -%}
+                    '{{ "{{ result }}" }}'
+              - name: Convert members_list to correct format
+                set_fact:
+                  members_string: '{{ "{{ members_list | join(',') }}" }}'
             roles:
               - community.mongodb.mongodb_repository
               - community.mongodb.mongodb_install
@@ -47,11 +58,7 @@ stringData:
                   ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
                   ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
                   replica_set: '{{ "{{ replicaset_name }}" }}'                  
-                  members:
-                    {%- set ns = namespace -%}
-                    {%- for i in range(replicaset_size) -%}
-                      - 'mongodb-'{{ "{{ i }}" }}'.'{{ "{{ ns }}" }}'.svc.cluster.local:'{{ "{{ config_port }}" }}'
-                    {%- endfor -%}
+                  members: '{{ "{{ members_string.split(',') }}" }}'                    
                   validate: no
                 when: ansible_hostname is search("-0")               
               - name: Wait for the replicaset to stabilise
