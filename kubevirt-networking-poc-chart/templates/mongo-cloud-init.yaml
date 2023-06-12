@@ -18,10 +18,20 @@ stringData:
     write_files:
       - content: |
           - hosts: localhost
-            pre_tasks:
-              - name: Include Ansible vars
-                include_vars:
-                  file: /mnt/ansible-vars/ansible_vars.yml
+            vars:
+              ansible_python_interpreter: /usr/bin/python3
+              config_port: 27017
+              mongodb_repository: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/6.0/x86_64/
+              bind_ip: 0.0.0.0
+              authorization: disabled
+              mongodb_use_tls: true
+              mongodb_certificate_key_file: /etc/ssl/mongodb.pem
+              mongodb_certificate_ca_file: /etc/ssl/ca.crt
+              skip_restart: false
+              replicaset_name: rsneo
+              repl_set_name: '{{ replicaset_name }}'
+              replicaset: true
+              master_host: mongodb-2.poc-certificates.svc.cluster.local
             roles:
               - community.mongodb.mongodb_repository
               - community.mongodb.mongodb_install
@@ -78,7 +88,6 @@ stringData:
       install_method: distro
       run_user: neo
     runcmd:
-      - mkdir -p /mnt/ansible-vars && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL-ANSIBLE-VARS | cut -f1 -d' ') /mnt/ansible-vars
       - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
       - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
       - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
