@@ -2,11 +2,10 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mongodb-vm-userdata
-  namespace: poc-certificates
+  namespace: {{ .Values.namespace }}
 type: Opaque
 stringData:
   userdata: |
-{{% raw %}}
     #cloud-config
     users:
       - name: neo
@@ -58,13 +57,13 @@ stringData:
                   ssl: true
                   ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
                   ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
-                  replica_set: '{{ "{{ replicaset_name }}" }}'
+                  replica_set: '{{ "{{ replicaset_name }}" }}'                  
                   members:
                     - "{{ master_host }}:{{ config_port }}"
                     - "mongodb-0.poc-certificates.svc.cluster.local:{{ config_port }}"
                     - "mongodb-1.poc-certificates.svc.cluster.local:{{ config_port }}"
                   validate: no
-                when: ansible_hostname == "mongodb-vm-2"
+                when: ansible_hostname == "mongodb-vm-2"               
               - name: Wait for the replicaset to stabilise
                 community.mongodb.mongodb_status:
                   login_host: '{{ "{{ master_host }}" }}'
@@ -84,7 +83,6 @@ stringData:
           ansible-playbook /root/mongodb_replica_setup.yml
         path: /root/run_ansible.sh
         permissions: '0755'
-{{% endraw %}}
     ansible:
       package_name: ansible-core
       install_method: distro
