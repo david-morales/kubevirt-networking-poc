@@ -33,9 +33,9 @@ spec:
             - name: default
               masquerade: {}
               model: virtio
-        filesystems:
-          - name: ansible-vars-disk
-            mountPath: /ansible_vars/
+          filesystems:
+            - name: mongo-ansible-vars-disk
+            virtiofs: {}
         resources:
           requests:
             memory: 2Gi
@@ -57,7 +57,7 @@ spec:
         - secret:
             secretName: mongodb-cert-tls
           name: secret-disk
-        - name: ansible-vars
-          configMap:
+        - configMap:
             name: mongo-ansible-vars
+          name: mongo-ansible-vars-disk
 {{- end }}
