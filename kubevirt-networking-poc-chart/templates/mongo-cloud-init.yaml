@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mongodb-vm-userdata
-  namespace: {{ .Values.namespace }}
+  namespace: poc-certificates
 type: Opaque
 stringData:
   userdata: |
@@ -30,7 +30,7 @@ stringData:
               mongodb_certificate_ca_file: /etc/ssl/ca.crt
               skip_restart: false
               replicaset_name: rsneo
-              repl_set_name: '{{ replicaset_name }}'
+              repl_set_name: '{{ "{{ replicaset_name }}" }}'
               replicaset: true
               master_host: mongodb-2.poc-certificates.svc.cluster.local
             roles:
@@ -53,12 +53,12 @@ stringData:
                   state: present
               - name: Ensure replicaset "rs0" exists
                 community.mongodb.mongodb_replicaset:
-                  login_host: '{{ master_host }}'
-                  login_port: '{{ config_port }}'
+                  login_host: '{{ "{{ master_host }}" }}'
+                  login_port: '{{ "{{ config_port }}" }}'
                   ssl: true
-                  ssl_certfile: '{{ mongodb_certificate_key_file }}'
-                  ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
-                  replica_set: '{{ replicaset_name }}'
+                  ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
+                  ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
+                  replica_set: '{{ "{{ replicaset_name }}" }}'
                   members:
                     - "{{ master_host }}:{{ config_port }}"
                     - "mongodb-0.poc-certificates.svc.cluster.local:{{ config_port }}"
@@ -67,12 +67,12 @@ stringData:
                 when: ansible_hostname == "mongodb-vm-2"
               - name: Wait for the replicaset to stabilise
                 community.mongodb.mongodb_status:
-                  login_host: '{{ master_host }}'
-                  login_port: '{{ config_port }}'
+                  login_host: '{{ "{{ master_host }}" }}'
+                  login_port: '{{ "{{ config_port }}" }}'
                   ssl: true
-                  ssl_certfile: '{{ mongodb_certificate_key_file }}'
-                  ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
-                  replica_set: '{{ replicaset_name }}'
+                  ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
+                  ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
+                  replica_set: '{{ "{{ replicaset_name }}" }}'
                   poll: 5
                   interval: 10
                   validate: minimal
