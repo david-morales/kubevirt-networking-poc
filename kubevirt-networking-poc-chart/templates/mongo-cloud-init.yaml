@@ -29,7 +29,7 @@ stringData:
               mongodb_certificate_ca_file: /etc/ssl/ca.crt
               skip_restart: false
               replicaset_name: rsneo
-              repl_set_name: '{{ replicaset_name }}'
+              repl_set_name: '{{ "{{ replicaset_name }}" }}'
               replicaset: true
               master_host: mongodb-2.poc-certificates.svc.cluster.local
             roles:
