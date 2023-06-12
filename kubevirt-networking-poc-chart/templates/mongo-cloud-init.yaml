@@ -96,3 +96,5 @@ stringData:
       - cat /etc/ssl/tls.crt /etc/ssl/tls.key > /etc/ssl/mongodb.pem
       - /root/run_ansible.sh
   ") }}"
+
+
