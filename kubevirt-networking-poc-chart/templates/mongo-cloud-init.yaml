@@ -49,7 +49,7 @@ stringData:
                   state: present
               - name: Ensure replicaset exists
                 community.mongodb.mongodb_replicaset:
-                  login_host: 'mongodb-0.{{ namespace }}.svc.cluster.local'
+                  login_host: 'mongodb-0."{{ namespace }}".svc.cluster.local'
                   login_port: '{{ "{{ config_port }}" }}'
                   ssl: true
                   ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
