@@ -24,10 +24,10 @@ spec:
                 bus: virtio
               name: mongodb-data
             - disk:
-              serial: SERIAL
+              serial: 1SERIAL
               name: secret-disk
             - disk:              
-              serial: SERIALANSIBLEVARS
+              serial: 2SERIALANSIBLEVARS
               name: ansible-vars-disk
           interfaces:
             - name: default
