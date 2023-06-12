@@ -26,6 +26,9 @@ spec:
             - disk:
               serial: SERIAL
               name: secret-disk
+            - disk:              
+              serial: SERIALANSIBLEVARS
+              name: ansible-vars-disk
           interfaces:
             - name: default
               masquerade: {}
@@ -51,4 +54,7 @@ spec:
         - secret:
             secretName: mongodb-cert-tls
           name: secret-disk
+        - configMap:
+            name: ansible-vars
+          name: ansible-vars-disk
 {{- end }}
