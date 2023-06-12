@@ -28,7 +28,7 @@ stringData:
                     {%- for i in range(replicaset_size) -%}
                       {%- set _ = result.append('mongodb-' ~ i ~ '.' ~ namespace ~ '.svc.cluster.local:' ~ config_port) -%}
                     {%- endfor -%}
-                    {{ result }}
+                    '{{ "{{ result }}" }}'
             roles:
               - community.mongodb.mongodb_repository
               - community.mongodb.mongodb_install
