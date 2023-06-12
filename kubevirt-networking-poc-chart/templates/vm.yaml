@@ -55,6 +55,6 @@ spec:
             secretName: mongodb-cert-tls
           name: secret-disk
         - configMap:
-            name: ansible-vars
+            name: mongo-ansible-vars
           name: ansible-vars-disk
 {{- end }}
