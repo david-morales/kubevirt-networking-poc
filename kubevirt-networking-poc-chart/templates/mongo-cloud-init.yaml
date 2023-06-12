@@ -78,6 +78,9 @@ stringData:
       install_method: distro
       run_user: neo
     runcmd:
+      # mount the ConfigMap
+      - "mkdir /mnt/ansible_vars"
+      - "mount -t virtiofs config-fs /mnt/ansible_vars"
       - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
       - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
       - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
