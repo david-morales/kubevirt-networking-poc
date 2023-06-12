@@ -1,16 +1,15 @@
-{{- $root := . -}}
-{{- range $i := until (int $root.Values.mongodb.replicas) }}
+{{- range $i := until (int .Values.mongodb.replicaCount) }}
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   name: mongodb-vm-{{ $i }}
-  namespace: {{ $root.Values.namespace }}
+  namespace: {{ .Values.namespace }}
 spec:
   running: true
   template:
     metadata:
       labels:
-        kubevirt.io/domain: mongodb-vm
+        kubevirt.io/domain: mongodb-vm-{{ $i }}
     spec:
       domain:
         devices:
@@ -41,7 +40,7 @@ spec:
       volumes:
         - name: containerdisk
           containerDisk:
-            image: "{{ $root.Values.vm.imageName }}:{{ $root.Values.vm.imageTag }}"
+            image: "quay.io/containerdisks/centos-stream:9"
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:

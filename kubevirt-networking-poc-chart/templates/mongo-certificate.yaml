@@ -6,11 +6,7 @@ metadata:
 spec:
   commonName: mongodb.{{ .Values.namespace }}.svc
   dnsNames:
-  - mongodb.{{ .Values.namespace }}.svc.cluster.local
-  - mongodb-vm
-  - mongodb-vm-0
-  - mongodb-vm-1
-  - mongodb-vm-2
+  - "*.{{ .Values.namespace }}.svc.cluster.local"
   - mongodb
   issuerRef:
     name: selfsigned-issuer

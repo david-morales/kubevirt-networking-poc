@@ -28,13 +28,15 @@ stringData:
               mongodb_certificate_key_file: /etc/ssl/mongodb.pem
               mongodb_certificate_ca_file: /etc/ssl/ca.crt
               skip_restart: false
-              replicaset_name: rs0
+              replicaset_name: rsneo
+              repl_set_name: '{{ replicaset_name }}'
+              replicaset: true
+              master_host: mongodb-2.poc-certificates.svc.cluster.local
             roles:
               - community.mongodb.mongodb_repository
               - community.mongodb.mongodb_install
-              - community.mongodb.mongodb_config
               - community.mongodb.mongodb_mongod
-            tasks:
+            post_tasks:
               - name: install python-setuptools
                 package:
                   name: python-setuptools
@@ -47,68 +49,33 @@ stringData:
               - name: Ensure pymongo is installed
                 pip:
                   name: pymongo>2.4.2
+                  state: present
               - name: Ensure replicaset "rs0" exists
                 community.mongodb.mongodb_replicaset:
-                  login_host: mongodb-vm-2
-                  login_port: 27017
-                  replica_set: '{{ "{{ replicaset_name }}" }}'
-                  members:
-                    - mongodb-vm-2:27017
+                  login_host: '{{ master_host }}'
+                  login_port: '{{ config_port }}'
                   ssl: true
-                  ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
-                  ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
-                  validate: false
-                when: ansible_hostname == "mongodb-vm-2"
+                  ssl_certfile: '{{ mongodb_certificate_key_file }}'
+                  ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
+                  replica_set: '{{ replicaset_name }}'                  
+                  members:
+                    - "{{ master_host }}:{{ config_port }}"
+                    - "mongodb-0.poc-certificates.svc.cluster.local:{{ config_port }}"
+                    - "mongodb-1.poc-certificates.svc.cluster.local:{{ config_port }}"
+                  validate: no
+                when: ansible_hostname == "mongodb-vm-2"               
               - name: Wait for the replicaset to stabilise
                 community.mongodb.mongodb_status:
-                  login_host: mongodb-vm-2
-                  login_port: 27017
+                  login_host: '{{ master_host }}'
+                  login_port: '{{ config_port }}'
                   ssl: true
-                  ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
-                  ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
-                  replica_set: '{{ "{{ replicaset_name }}" }}'
-                  poll: 5
-                  interval: 10
-                  validate: false
-                when: ansible_hostname == "mongodb-vm-0" or
-                      ansible_hostname == "mongodb-vm-1"
-              - name: Add a member to the replicaset
-                community.mongodb.mongodb_replicaset:
-                  login_host: mongodb-vm-2
-                  login_port: 27017
-                  ssl: true
-                  ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
-                  ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
-                  replica_set: '{{ "{{ replicaset_name }}" }}'
-                  reconfigure: yes
-                  members:
-                    - host: mongodb-vm-0:27017
-                when: ansible_hostname == "mongodb-vm-0"
-              - name: Add a member to the replicaset
-                community.mongodb.mongodb_replicaset:
-                  login_host: mongodb-vm-2
-                  login_port: 27017
-                  ssl: true
-                  ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
-                  ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
-                  replica_set: '{{ "{{ replicaset_name }}" }}'
-                  reconfigure: yes
-                  members:
-                    - host: mongodb-vm-1:27017
-                when: ansible_hostname == "mongodb-vm-1"
-              - name: Wait for the replicaset to stabilise
-                community.mongodb.mongodb_status:
-                  login_host: mongodb-vm-2
-                  login_port: 27017
-                  ssl: true
-                  ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
-                  ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
-                  replica_set: '{{ "{{ replicaset_name }}" }}'
+                  ssl_certfile: '{{ mongodb_certificate_key_file }}'
+                  ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
+                  replica_set: '{{ replicaset_name }}'
                   poll: 5
                   interval: 10
                   validate: minimal
-                when: ansible_hostname == "mongodb-vm-0" or
-                      ansible_hostname == "mongodb-vm-1"
+                when: ansible_hostname == "mongodb-vm-2"
         path: /root/mongodb_replica_setup.yml
       - content: |
           #!/bin/bash

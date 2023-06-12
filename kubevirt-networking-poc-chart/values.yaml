@@ -13,5 +13,4 @@ vm:
   imageTag: 9
 
 mongodb:
-  replicas: 3
-  master: 0
+  replicaCount: 3
