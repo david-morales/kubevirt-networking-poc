@@ -26,7 +26,7 @@ spec:
             - disk: {}
               name: secret-disk
               serial: SERIAL
-            - name: ansible-vars-disk
+            - name: mongo-ansible-vars-disk
               disk:
                 bus: virtio
           interfaces:
