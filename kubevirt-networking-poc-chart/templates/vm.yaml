@@ -14,21 +14,21 @@ spec:
       domain:
         devices:
           disks:
-            - name: containerdisk
-              disk:
-                bus: virtio
-            - name: cloudinitdisk
-              disk:
-                bus: virtio
-            - name: mongodb-data
-              disk:
-                bus: virtio
             - disk:
-              name: secret-disk
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: mongodb-data
+            - disk:
               serial: SERIAL
+              name: secret-disk
             - disk:
-              name: mongo-ansible-vars-disk
               serial: SERIAL-ANSIBLE-VARS
+              name: mongo-ansible-vars-disk
           interfaces:
             - name: default
               masquerade: {}
