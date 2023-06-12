@@ -13,4 +13,9 @@ vm:
   imageTag: 9
 
 mongodb:
+  hostname_prefix: mongodb-vm
   replicaCount: 3
+  port: 27017
+  authorization: disabled
+  mongodb_use_tls: true
+  replicaset_name: rsneo

@@ -6,15 +6,17 @@ metadata:
 data:
   ansible_vars.yml: |
     ansible_python_interpreter: /usr/bin/python3
-    config_port: 27017
+    namespace: {{ .Values.namespace }}
+    hostname_prefix: {{ .Values.mongodb.hostname_prefix }}
+    replicaset_size: {{ .Values.mongodb.replicaCount }}
+    config_port: {{ .Values.mongodb.port }}
     mongodb_repository: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/6.0/x86_64/
     bind_ip: 0.0.0.0
-    authorization: disabled
-    mongodb_use_tls: true
+    authorization: {{ .Values.mongodb.authorization }}
+    mongodb_use_tls: {{ .Values.mongodb.mongodb_use_tls }}
     mongodb_certificate_key_file: /etc/ssl/mongodb.pem
     mongodb_certificate_ca_file: /etc/ssl/ca.crt
     skip_restart: false
-    replicaset_name: rsneo
+    replicaset_name: {{ .Values.mongodb.replicaset_name }}
     repl_set_name: '{{ "{{ replicaset_name }}" }}'
     replicaset: true
-    master_host: mongodb-2.poc-certificates.svc.cluster.local

@@ -13,7 +13,6 @@ stringData:
         lock_passwd: false
         groups: users, admin
         sudo: ALL=(ALL) NOPASSWD:ALL
-    hostname: mongodb-vm
     package_upgrade: true
     write_files:
       - content: |
@@ -22,6 +21,14 @@ stringData:
               - name: Include Ansible vars
                 include_vars:
                   file: /mnt/ansible-vars/ansible_vars.yml
+              - name: Generate members list
+                set_fact:
+                  members_list: >-
+                    {%- set result = [] -%}
+                    {%- for i in range(replicaset_size) -%}
+                      {%- set _ = result.append('mongodb-' ~ i ~ '.' ~ namespace ~ '.svc.cluster.local:' ~ config_port) -%}
+                    {%- endfor -%}
+                    {{ result }}
             roles:
               - community.mongodb.mongodb_repository
               - community.mongodb.mongodb_install
@@ -40,23 +47,21 @@ stringData:
                 pip:
                   name: pymongo>2.4.2
                   state: present
-              - name: Ensure replicaset "rs0" exists
+              - name: Ensure replicaset exists
                 community.mongodb.mongodb_replicaset:
-                  login_host: '{{ "{{ master_host }}" }}'
+                  login_host: 'mongodb-0.{{ namespace }}.svc.cluster.local'
                   login_port: '{{ "{{ config_port }}" }}'
                   ssl: true
                   ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
                   ssl_ca_certs: '{{ "{{ mongodb_certificate_ca_file }}" }}'
                   replica_set: '{{ "{{ replicaset_name }}" }}'                  
                   members:
-                    - '{{ "{{ master_host }}:{{ config_port }}" }}'
-                    - 'mongodb-0.poc-certificates.svc.cluster.local:{{ "{{" }} config_port {{ "}}" }}'
-                    - 'mongodb-1.poc-certificates.svc.cluster.local:{{ "{{" }} config_port {{ "}}" }}'
+                    members: '{{ "{{ members_list }}" }}'
                   validate: no
-                when: ansible_hostname == "mongodb-vm-2"               
+                when: ansible_hostname is search("-0")               
               - name: Wait for the replicaset to stabilise
                 community.mongodb.mongodb_status:
-                  login_host: '{{ "{{ master_host }}" }}'
+                  login_host: 'mongodb-0.{{ namespace }}.svc.cluster.local'
                   login_port: '{{ "{{ config_port }}" }}'
                   ssl: true
                   ssl_certfile: '{{ "{{ mongodb_certificate_key_file }}" }}'
@@ -65,7 +70,7 @@ stringData:
                   poll: 5
                   interval: 10
                   validate: minimal
-                when: ansible_hostname == "mongodb-vm-2"
+                when: ansible_hostname is search("-0")         
         path: /root/mongodb_replica_setup.yml
       - content: |
           #!/bin/bash
