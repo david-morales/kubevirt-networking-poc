@@ -29,6 +29,9 @@ spec:
             - disk:              
               serial: 2SERIALANSIBLEVARS
               name: ansible-vars-disk
+            - disk:              
+              serial: 3SERIALANSIBLEPLAYBOOK
+              name: ansible-playbook-disk
           interfaces:
             - name: default
               masquerade: {}
@@ -58,4 +61,7 @@ spec:
         - configMap:
             name: mongo-ansible-vars
           name: ansible-vars-disk
+        - configMap:
+            name: mongo-ansible-playbook
+          name: ansible-playbook-disk
 {{- end }}
