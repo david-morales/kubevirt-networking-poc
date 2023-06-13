@@ -5,4 +5,4 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   ansible_playbook.yml: |-
-{{ .Files.Get "cansible/mongo-ansible-playbook.yml" | indent 4 }}
+{{ .Files.Get "ansible/mongo-ansible-playbook.yml" | indent 4 }}
