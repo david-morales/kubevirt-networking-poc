@@ -23,7 +23,8 @@
         state: present
     - name: Generate list of mongodb hosts and convert to csv string
       set_fact:
-        mongodb_csv: "{{ (mongodb_csv|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017'])|join(',') }}"
+        mongodb_list: "{{ mongodb_list|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017'] }}"
+        mongodb_csv: "{{ (mongodb_list|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017'])|join(',') }}"
       loop: "{{ range(0, replicaset_size)|list }}"
     - debug:
         var: mongodb_csv
