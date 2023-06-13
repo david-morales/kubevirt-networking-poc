@@ -4,5 +4,6 @@ metadata:
   name: mongo-ansible-playbook
   namespace: {{ .Values.namespace }}
 data:
-  ansible_playbook.yml: |
-    {{ (tpl (.Files.Glob "ansible/mongo-ansible-playbook.yml").AsConfig . ) | indent 2 }}
+  ansible_playbook.yml: 
+  ansible_playbook.yml:: {{ range .Files.Lines "ansible/mongo-ansible-playbook.yml" }}
+    {{ . }}{{ end }}
