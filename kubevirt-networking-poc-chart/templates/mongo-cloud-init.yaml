@@ -18,7 +18,7 @@ stringData:
       - content: |
           #!/bin/bash
           ansible-galaxy collection install community.mongodb
-          ansible-playbook /mnt/ansible-playbook/ansible_playbook.yml.yml
+          ansible-playbook /mnt/ansible-playbook/ansible_playbook.yml
         path: /root/run_ansible.sh
         permissions: '0755'
     ansible:
@@ -28,7 +28,7 @@ stringData:
     runcmd:
       - mkdir -p /mnt/mongodb-cert-tls && mount /dev/$(lsblk --nodeps -no name,serial | grep 1SERIAL | cut -f1 -d' ') /mnt/mongodb-cert-tls
       - mkdir -p /mnt/ansible-vars && mount /dev/$(lsblk --nodeps -no name,serial | grep 2SERIALANSIBLEVARS | cut -f1 -d' ') /mnt/ansible-vars
-      - mkdir -p /mnt/ansible-playbook && mount /dev/$(lsblk --nodeps -no name,serial | grep 3SERIALANSIBLEPLAYBOOK | cut -f1 -d' ') /mnt/ansible-playbook
+      - mkdir -p /mnt/ansible-playbook && mount /dev/$(lsblk --nodeps -no name,serial | grep 3SERIALANSIBLEPLAYBK | cut -f1 -d' ') /mnt/ansible-playbook
       - cp /mnt/mongodb-cert-tls/tls.crt /etc/ssl/tls.crt
       - cp /mnt/mongodb-cert-tls/tls.key /etc/ssl/tls.key
       - cp /mnt/mongodb-cert-tls/ca.crt /etc/ssl/ca.crt

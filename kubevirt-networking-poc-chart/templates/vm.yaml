@@ -30,7 +30,7 @@ spec:
               serial: 2SERIALANSIBLEVARS
               name: ansible-vars-disk
             - disk:              
-              serial: 3SERIALANSIBLEPLAYBOOK
+              serial: 3SERIALANSIBLEPLAYBK
               name: ansible-playbook-disk
           interfaces:
             - name: default
