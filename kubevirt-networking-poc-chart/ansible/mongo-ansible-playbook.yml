@@ -25,6 +25,8 @@
       set_fact:
         mongodb_csv: "{{ (mongodb_csv|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017'])|join(',') }}"
       loop: "{{ range(0, replicaset_size)|list }}"
+    - debug:
+        var: mongodb_csv
     - name: Ensure replicaset exists
       community.mongodb.mongodb_replicaset:
         login_host: 'mongodb-0.{{ namespace }}.svc.cluster.local'
