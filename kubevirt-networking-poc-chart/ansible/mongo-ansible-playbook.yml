@@ -21,10 +21,10 @@
       pip:
         name: pymongo>2.4.2
         state: present
-    - name: Generate CSV string of mongodb hosts
+    - name: Generate list of mongodb hosts and convert to csv string
       set_fact:
-        mongodb_csv: "{{ mongodb_csv|default('') + (mongodb_csv|default('') != '' | ternary(',', '') ) + 'mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017' }}"
-      loop: '{{ range(0, replicaset_size)|list }}'
+        mongodb_csv: "{{ (mongodb_csv|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:27017'])|join(',') }}"
+      loop: "{{ range(0, replicaset_size)|list }}"
     - name: Ensure replicaset exists
       community.mongodb.mongodb_replicaset:
         login_host: 'mongodb-0.{{ namespace }}.svc.cluster.local'
