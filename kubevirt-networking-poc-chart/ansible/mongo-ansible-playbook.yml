@@ -3,6 +3,13 @@
     - name: Include Ansible vars
       include_vars:
         file: /mnt/ansible-vars/ansible_vars.yml
+    - name: Create log and data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - '{{ db_path }}'
+        - '{{ log_path }}'
   roles:
     - community.mongodb.mongodb_repository
     - community.mongodb.mongodb_install

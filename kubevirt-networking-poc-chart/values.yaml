@@ -13,13 +13,13 @@ vm:
   imageTag: 9
 
 mongodb:
+  version: 4.2
   hostname_prefix: mongodb-vm
+  replicaset_name: rsneo
   replicaCount: 3
   port: 27017
   authorization: enabled
   mongodb_use_tls: false
-  replicaset_name: rsneo
-  db_path: /product/mongodb/data
-  log_path: /product/mongodb/log/mongod.log
-  version: 4.2
+  
+
   #specific_mongodb_version: 4.2.6-1.el8 not working
