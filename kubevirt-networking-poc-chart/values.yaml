@@ -18,7 +18,7 @@ mongodb:
   replicaset_name: rsneo
   replicaCount: 3
   port: 27017
-  authorization: enabled
+  authorization: disabled
   mongodb_use_tls: false
   
 
