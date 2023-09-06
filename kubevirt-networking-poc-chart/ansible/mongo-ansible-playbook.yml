@@ -8,18 +8,28 @@
     - community.mongodb.mongodb_install
     - community.mongodb.mongodb_mongod
   post_tasks:
-    - name: Install python-setuptools
-      package:
-        name: python-setuptools
+    - name: Ensure Python3 is available
+      yum:
+        name: 
+          - python3 
+          - python3-setuptools
+          - python3-pip
+        state: latest  
+    - name: Ensure setuptools is installed
+      pip:
+        name: setuptools
         state: latest
-        update_cache: yes
-    - name: Install python-pip
-      package:
-        name: python-pip
-        state: latest
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
     - name: Ensure pymongo is installed
       pip:
-        name: pymongo>2.4.2
+        name: pymongo
+        state: latest
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+    - name: Ensure mongo shell is installed
+      package:
+        name: mongodb-org-shell
         state: present
     - name: Generate list of mongodb hosts and convert to csv string
       set_fact:
