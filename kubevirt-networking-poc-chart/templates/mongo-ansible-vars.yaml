@@ -13,8 +13,8 @@ data:
     mongodb_version: {{ .Values.mongodb.version }}
     bind_ip: 0.0.0.0
     authorization: {{ .Values.mongodb.authorization }}
-    db_path: {{ .Values.mongodb.db_path }}
-    log_path: {{ .Values.mongodb.log_path }}
+    db_path: /product/mongodb/data
+    log_path: /product/mongodb/log/mongod.log
     mongodb_use_tls: {{ .Values.mongodb.mongodb_use_tls }}
     mongodb_certificate_key_file: /etc/ssl/mongodb.pem
     mongodb_certificate_ca_file: /etc/ssl/ca.crt
