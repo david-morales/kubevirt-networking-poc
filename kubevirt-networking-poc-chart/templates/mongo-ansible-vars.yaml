@@ -11,10 +11,11 @@ data:
     replicaset_size: {{ .Values.mongodb.replicaCount }}
     config_port: {{ .Values.mongodb.port }}
     mongodb_version: {{ .Values.mongodb.version }}
+    #specific_mongodb_version: 4.2.6 NOT WORKING
     bind_ip: 0.0.0.0
     authorization: {{ .Values.mongodb.authorization }}
-    db_path: /product/mongodb/data
-    log_path: /product/mongodb/log/mongod.log
+    #db_path: /product/mongodb/data NOT WORKING
+    #log_path: /product/mongodb/log NOT WORKING
     mongodb_use_tls: {{ .Values.mongodb.mongodb_use_tls }}
     mongodb_certificate_key_file: /etc/ssl/mongodb.pem
     mongodb_certificate_ca_file: /etc/ssl/ca.crt
@@ -22,3 +23,4 @@ data:
     replicaset_name: {{ .Values.mongodb.replicaset_name }}
     repl_set_name: '{{ "{{ replicaset_name }}" }}'
     replicaset: true
+    openssl_keyfile_path: /etc/replicaset-key
