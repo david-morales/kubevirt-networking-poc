@@ -1,3 +1,5 @@
+{{- $namespace := .Values.namespace }}
+{{- $secret := lookup "v1" "Secret" $namespace "app-user-password" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -25,4 +27,4 @@ data:
     replicaset: true
     openssl_keyfile_path: /etc/replicaset-key
     admin_user_pwd: admin
-    app_user_pwd: {{ .Values.mongodb.app_user_password }}
+    app_user_pwd: {{ index $secret.data "password" | b64dec | quote }}

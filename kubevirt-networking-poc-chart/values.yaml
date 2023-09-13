@@ -20,5 +20,5 @@ mongodb:
   port: 27017
   authorization: enabled
   mongodb_use_tls: false
-  app_user_password: "KyooZnZ2VkJoU21uQ0FNTQ=="
+  #define the user app password as the secret app-user-password
   #specific_mongodb_version: 4.2.6-1.el8 not working
