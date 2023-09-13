@@ -8,9 +8,13 @@ app = Flask(__name__)
 def welcome():
 
     # Read environment variables
+    app_database = os.environ.get('APP_DATABASE')
+    replicaset = os.environ.get('REPLICASET')
     mongodb_user = os.environ.get('APP_USER')
     mongodb_password = os.environ.get('APP_USER_PASSWORD')
     tls_enabled = os.environ.get('TLS_ENABLED')
+
+    
 
 
     # Concatenate the certificate and key into a single PEM file at runtime
@@ -22,15 +26,17 @@ def welcome():
             pem_file.write(key_file.read())
 
     # Use the concatenated certificate and key file in the MongoClient connection
-    client = MongoClient('mongodb', 27017, 
+    client = MongoClient(host=['mongodb-0:27017', 'mongodb-1:27017', 'mongodb-2:27017'],
+                            replicaset=replicaset,
                             tls=tls_enabled, 
                             tlsCertificateKeyFile=pem_file_path, 
                             tlsCAFile='/certificates/ca.crt',
                             username=mongodb_user,
-                            password=mongodb_password
+                            password=mongodb_password,
+                            authSource=app_database
                             )
 
-    db = client['demo']
+    db = client[app_database]
     collection = db['names']
     name = collection.find_one()['name']
     client.close()

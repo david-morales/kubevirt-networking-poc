@@ -27,7 +27,7 @@ spec:
                   name: app-user-password
                   key: password
             - name: TLS_ENABLED
-              value: {{ .Values.mongodb.mongodb_use_tls }}
+              value: {{ .Values.mongodb.mongodb_use_tls | quote }}
           volumeMounts:
             - name: mongodb-cert
               mountPath: /certificates
