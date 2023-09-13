@@ -1,11 +1,13 @@
+#TO DO
+# - Use x.509 certificates for replicaset members authentication
+# - Use specific mongo version (not working)
+# - Use specific dbpath (not working)
+# - Use specific logpath (not working)
 - hosts: localhost
   pre_tasks:
     - name: Include Ansible vars
       include_vars:
         file: /mnt/ansible-vars/ansible_vars.yml
-    - name: Generate random base64 string
-      shell: openssl rand -base64 756
-      register: openssl_keyfile_content
   roles:
     - community.mongodb.mongodb_linux
     - community.mongodb.mongodb_repository
@@ -44,24 +46,45 @@
         var: mongodb_csv
     - name: Ensure replicaset exists
       community.mongodb.mongodb_replicaset:
-        login_host: 'mongodb-0.{{ namespace }}.svc.cluster.local'
+        login_host: localhost
+        login_port: '{{ config_port }}'
+        ssl: '{{ mongodb_use_tls }}'
+        ssl_certfile: '{{ mongodb_certificate_key_file }}'
+        ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
+        replica_set: '{{ replicaset_name }}'
+        members: '{{  mongodb_csv  }}'  
+        validate: no
+      register: create_rs
+      when: ansible_hostname is search("-0")               
+    - name: Wait for replicaset config to settle
+      pause:
+        seconds: 10
+      when: create_rs.changed
+    - name: Wait for the replicaset to stabilise
+      community.mongodb.mongodb_status:
+        login_host: localhost
         login_port: '{{ config_port }}'
         ssl: '{{ mongodb_use_tls }}'
         ssl_certfile: '{{ mongodb_certificate_key_file }}'
         ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
         replica_set: '{{ replicaset_name }}'    
-        members: '{{  mongodb_csv  }}'  
-        validate: no
-      when: ansible_hostname is search("-0")               
-    - name: Wait for the replicaset to stabilise
-      community.mongodb.mongodb_status:
-        login_host: 'mongodb-0.{{ namespace }}.svc.cluster.local'
-        login_port: '{{ config_port }}'
-        ssl: '{{ mongodb_use_tls }}'
-        ssl_certfile: '{{ mongodb_certificate_key_file }}'
-        ssl_ca_certs: '{{ mongodb_certificate_ca_file  }}'
-        replica_set: '{{ replicaset_name }}'    
         poll: 6
         interval: 10
         validate: minimal
-      when: ansible_hostname is search("-0") 
+      register: rs
+      when: ansible_hostname is search("-0")
+    - debug:
+        var: rs
+    - name: Add MongoDB Admin User using localhost exception
+      community.mongodb.mongodb_user:
+        name: admin
+        password: admin
+        database: admin
+        roles:
+          - "userAdmin"
+          - "root"
+      register: admin_user
+      when:
+        - ansible_hostname is search("-0")
+    - debug:
+        var: admin_user 
