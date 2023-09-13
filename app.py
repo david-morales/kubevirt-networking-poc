@@ -22,6 +22,7 @@ def welcome():
     print(f"REPLICASET: {replicaset}")
     print(f"APP_USER: {mongodb_user}")
     print(f"TLS_ENABLED: {tls_enabled}")
+    print(f"APP USER PWD: {mongodb_password}")
 
     client= None
 
@@ -42,8 +43,7 @@ def welcome():
                                 tlsCertificateKeyFile=pem_file_path, 
                                 tlsCAFile='/certificates/ca.crt',
                                 username=mongodb_user,
-                                password=mongodb_password,
-                                authSource=app_database
+                                password=mongodb_password
                                 )
     else:
         # Use the concatenated certificate and key file in the MongoClient connection
