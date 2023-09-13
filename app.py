@@ -14,27 +14,37 @@ def welcome():
     mongodb_password = os.environ.get('APP_USER_PASSWORD')
     tls_enabled = os.environ.get('TLS_ENABLED')
 
-    
 
+    client= None
 
-    # Concatenate the certificate and key into a single PEM file at runtime
-    pem_file_path = "/tmp/tls.pem"
-    with open(pem_file_path, 'w') as pem_file:
-        with open('/certificates/tls.crt', 'r') as crt_file:
-            pem_file.write(crt_file.read())
-        with open('/certificates/tls.key', 'r') as key_file:
-            pem_file.write(key_file.read())
+    if tls_enabled:
 
-    # Use the concatenated certificate and key file in the MongoClient connection
-    client = MongoClient(host=['mongodb-0:27017', 'mongodb-1:27017', 'mongodb-2:27017'],
-                            replicaset=replicaset,
-                            tls=tls_enabled, 
-                            tlsCertificateKeyFile=pem_file_path, 
-                            tlsCAFile='/certificates/ca.crt',
-                            username=mongodb_user,
-                            password=mongodb_password,
-                            authSource=app_database
-                            )
+        # Concatenate the certificate and key into a single PEM file at runtime
+        pem_file_path = "/tmp/tls.pem"
+        with open(pem_file_path, 'w') as pem_file:
+            with open('/certificates/tls.crt', 'r') as crt_file:
+                pem_file.write(crt_file.read())
+            with open('/certificates/tls.key', 'r') as key_file:
+                pem_file.write(key_file.read())
+
+        # Use the concatenated certificate and key file in the MongoClient connection
+        client = MongoClient(host=['mongodb-0:27017', 'mongodb-1:27017', 'mongodb-2:27017'],
+                                replicaset=replicaset,
+                                tls=tls_enabled, 
+                                tlsCertificateKeyFile=pem_file_path, 
+                                tlsCAFile='/certificates/ca.crt',
+                                username=mongodb_user,
+                                password=mongodb_password,
+                                authSource=app_database
+                                )
+    else:
+        # Use the concatenated certificate and key file in the MongoClient connection
+        client = MongoClient(host=['mongodb-0:27017', 'mongodb-1:27017', 'mongodb-2:27017'],
+                                replicaset=replicaset,
+                                username=mongodb_user,
+                                password=mongodb_password,
+                                authSource=app_database
+                                )
 
     db = client[app_database]
     collection = db['names']
