@@ -78,13 +78,22 @@
     - name: Add MongoDB Admin User using localhost exception
       community.mongodb.mongodb_user:
         name: admin
-        password: admin
+        password: '{{ admin_user_pwd }}'
         database: admin
-        roles:
-          - "userAdmin"
-          - "root"
+        roles: root
+        state: present
       register: admin_user
       when:
         - ansible_hostname is search("-0")
     - debug:
-        var: admin_user 
+        var: admin_user
+    - name: Add the application user, the primary server is automatically discovered and written to
+      community.mongodb.mongodb_user:
+        login_user: admin
+        login_password: '{{ admin_user_pwd }}'
+        database: '{{ namespace }}'
+        name: '{{ namespace }}'
+        replica_set: '{{ replicaset_name }}'
+        password: '{{ app_user_pwd }}'
+        roles: dbOwner
+        state: present

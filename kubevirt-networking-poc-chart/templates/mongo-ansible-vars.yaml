@@ -24,3 +24,5 @@ data:
     repl_set_name: '{{ "{{ replicaset_name }}" }}'
     replicaset: true
     openssl_keyfile_path: /etc/replicaset-key
+    admin_user_pwd: admin
+    app_user_pwd: {{ .Values.mongodb.app_user_password }}
