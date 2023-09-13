@@ -12,8 +12,16 @@ def welcome():
     replicaset = os.environ.get('REPLICASET')
     mongodb_user = os.environ.get('APP_USER')
     mongodb_password = os.environ.get('APP_USER_PASSWORD')
-    tls_enabled = os.environ.get('TLS_ENABLED')
+    tls_enabled = os.environ.get('TLS_ENABLED', 'False')
 
+    # Convert the string to a boolean
+    tls_enabled = tls_enabled.lower() == 'true'
+
+    # Print values to the console
+    print(f"APP_DATABASE: {app_database}")
+    print(f"REPLICASET: {replicaset}")
+    print(f"APP_USER: {mongodb_user}")
+    print(f"TLS_ENABLED: {tls_enabled}")
 
     client= None
 
