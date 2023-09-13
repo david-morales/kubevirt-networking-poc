@@ -27,4 +27,8 @@ data:
     replicaset: true
     openssl_keyfile_path: /etc/replicaset-key
     admin_user_pwd: admin
+    {{- if $secret }}
     app_user_pwd: {{ index $secret.data "password" | b64dec | quote }}
+    {{- else }}
+    app_user_pwd: "123456"
+    {{- end }}
