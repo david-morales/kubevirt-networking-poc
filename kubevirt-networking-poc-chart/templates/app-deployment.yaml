@@ -18,6 +18,16 @@ spec:
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
           ports:
             - containerPort: 8080
+          env:
+            - name: APP_USER
+              value: {{ .Values.namespace }}
+            - name: APP_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-user-password
+                  key: password
+            - name: TLS_ENABLED
+              value: {{ .Values.mongodb.mongodb_use_tls }}
           volumeMounts:
             - name: mongodb-cert
               mountPath: /certificates

@@ -1,10 +1,18 @@
 from flask import Flask, jsonify
 from pymongo import MongoClient
+import os
 
 app = Flask(__name__)
 
 @app.route('/')
 def welcome():
+
+    # Read environment variables
+    mongodb_user = os.environ.get('APP_USER')
+    mongodb_password = os.environ.get('APP_USER_PASSWORD')
+    tls_enabled = os.environ.get('TLS_ENABLED')
+
+
     # Concatenate the certificate and key into a single PEM file at runtime
     pem_file_path = "/tmp/tls.pem"
     with open(pem_file_path, 'w') as pem_file:
@@ -15,9 +23,11 @@ def welcome():
 
     # Use the concatenated certificate and key file in the MongoClient connection
     client = MongoClient('mongodb', 27017, 
-                            tls=True, 
+                            tls=tls_enabled, 
                             tlsCertificateKeyFile=pem_file_path, 
-                            tlsCAFile='/certificates/ca.crt'
+                            tlsCAFile='/certificates/ca.crt',
+                            username=mongodb_user,
+                            password=mongodb_password
                             )
 
     db = client['demo']
