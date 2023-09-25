@@ -8,12 +8,6 @@
     - name: Include Ansible vars
       include_vars:
         file: /mnt/ansible-vars/ansible_vars.yml
-  roles:
-    - community.mongodb.mongodb_linux
-    - community.mongodb.mongodb_repository
-    - community.mongodb.mongodb_install
-    - community.mongodb.mongodb_mongod
-  post_tasks:
     - name: Ensure Python3 is available
       yum:
         name: 
@@ -25,14 +19,16 @@
       pip:
         name: setuptools
         state: latest
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - community.mongodb.mongodb_repository
+    - community.mongodb.mongodb_install
+    - community.mongodb.mongodb_mongod
+    - community.mongodb.mongodb_linux
+  post_tasks:
     - name: Ensure pymongo is installed
       pip:
         name: pymongo
         state: latest
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
     - name: Ensure mongo shell is installed
       package:
         name: mongodb-org-shell

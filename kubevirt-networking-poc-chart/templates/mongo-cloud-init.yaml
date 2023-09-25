@@ -13,7 +13,9 @@ stringData:
         lock_passwd: false
         groups: users, admin
         sudo: ALL=(ALL) NOPASSWD:ALL
-    package_upgrade: false
+
+    package_upgrade: true
+
     write_files:
       - content: |
           #!/bin/bash
@@ -21,11 +23,10 @@ stringData:
           ansible-playbook /mnt/ansible-playbook/ansible_playbook.yml
         path: /root/run_ansible.sh
         permissions: '0755'
-    ansible:
-      package_name: ansible-core
-      install_method: distro
-      run_user: neo
+
     runcmd:
+      - [ yum, -y, install, epel-release ]
+      - [ yum, -y, install, ansible ]
       - mkdir -p /mnt/ansible-vars && mount /dev/$(lsblk --nodeps -no name,serial | grep 2SERIALANSIBLEVARS | cut -f1 -d' ') /mnt/ansible-vars
       - mkdir -p /mnt/ansible-playbook && mount /dev/$(lsblk --nodeps -no name,serial | grep 3SERIALANSIBLEPLAYBK | cut -f1 -d' ') /mnt/ansible-playbook
       - /root/run_ansible.sh
