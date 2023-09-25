@@ -44,7 +44,7 @@ spec:
       volumes:
         - name: containerdisk
           containerDisk:
-            image: "quay.io/containerdisks/centos-stream:7-2009"
+            image: "quay.io/containerdisks/centos:7-2009"
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:
