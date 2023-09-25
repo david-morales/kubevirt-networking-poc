@@ -13,7 +13,7 @@ stringData:
         lock_passwd: false
         groups: users, admin
         sudo: ALL=(ALL) NOPASSWD:ALL
-    package_upgrade: true
+    package_upgrade: false
     write_files:
       - content: |
           #!/bin/bash
