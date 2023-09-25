@@ -9,7 +9,7 @@ spec:
   template:
     metadata:
       labels:
-        kubevirt.io/domain: mongodb-vm-{{ $i }}
+        kubevirt.io/domain: mongodb-vm
     spec:
       domain:
         devices:
@@ -23,9 +23,6 @@ spec:
             - disk:
                 bus: virtio
               name: mongodb-data
-            - disk:
-              serial: 1SERIAL
-              name: secret-disk
             - disk:              
               serial: 2SERIALANSIBLEVARS
               name: ansible-vars-disk
@@ -47,7 +44,7 @@ spec:
       volumes:
         - name: containerdisk
           containerDisk:
-            image: "quay.io/containerdisks/centos-stream:8"
+            image: "quay.io/containerdisks/centos-stream:7"
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:
@@ -55,9 +52,6 @@ spec:
         - name: mongodb-data
           persistentVolumeClaim:
             claimName: mongodb-pvc-{{ $i }}
-        - secret:
-            secretName: mongodb-cert-tls
-          name: secret-disk
         - configMap:
             name: mongo-ansible-vars
           name: ansible-vars-disk
