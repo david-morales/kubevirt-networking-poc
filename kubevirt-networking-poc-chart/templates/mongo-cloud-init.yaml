@@ -26,7 +26,8 @@ stringData:
 
     runcmd:
       - [ yum, -y, install, epel-release ]
-      - [ yum, -y, install, python3, python3-setuptools, python3-pip, python3-pymongo ]
+      - [ yum, -y, install, python3, python3-pip, python-setuptools ]
+      - [ yum, -y, install, libselinux-python3 ]
       - [ yum, -y, install, ansible ]
       - mkdir -p /mnt/ansible-vars && mount /dev/$(lsblk --nodeps -no name,serial | grep 2SERIALANSIBLEVARS | cut -f1 -d' ') /mnt/ansible-vars
       - mkdir -p /mnt/ansible-playbook && mount /dev/$(lsblk --nodeps -no name,serial | grep 3SERIALANSIBLEPLAYBK | cut -f1 -d' ') /mnt/ansible-playbook

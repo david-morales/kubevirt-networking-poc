@@ -7,16 +7,24 @@
   pre_tasks:
     - name: Include Ansible vars
       include_vars:
-        file: /mnt/ansible-vars/ansible_vars.yml  
+        file: /mnt/ansible-vars/ansible_vars.yml
+    - name: Install pymongo for Python 3
+      pip:
+        name: pymongo
+        executable: pip3
   post_tasks:
     - include_role:
-      name: community.mongodb.mongodb_repository
+        name: community.mongodb.mongodb_repository
     - name: Install mongodb-org using shell
       shell: yum install -y mongodb-org mongodb-org-shell
     - include_role:
-      name: community.mongodb.mongodb_mongod
+        name: community.mongodb.mongodb_mongod
+      vars:
+        ansible_python_interpreter: /usr/bin/python2.7
     - include_role:
-      name: community.mongodb.mongodb_linux
+        name: community.mongodb.mongodb_linux
+      vars:
+        ansible_python_interpreter: /usr/bin/python2.7
     - name: Generate list of mongodb hosts and convert to csv string
       set_fact:
         mongodb_list: "{{ mongodb_list|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:' + config_port|string] }}"
