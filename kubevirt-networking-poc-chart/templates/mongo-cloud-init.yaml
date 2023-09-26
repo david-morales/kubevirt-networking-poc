@@ -22,7 +22,7 @@ stringData:
           ansible-playbook /mnt/ansible-playbook/ansible_playbook.yml
         path: /root/run_ansible.sh
         permissions: '0755'
-       content: |
+      - content: |
           collections:
           - name: https://github.com/ansible-collections/community.mongodb.git
             type: git
