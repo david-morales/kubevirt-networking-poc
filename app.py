@@ -22,6 +22,7 @@ def welcome():
     print(f"REPLICASET: {replicaset}")
     print(f"APP_USER: {mongodb_user}")
     print(f"TLS_ENABLED: {tls_enabled}")
+    print(f"APP USER PWD: {mongodb_password}")
 
     client= None
 

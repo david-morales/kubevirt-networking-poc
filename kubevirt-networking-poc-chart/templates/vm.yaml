@@ -23,6 +23,9 @@ spec:
             - disk:
                 bus: virtio
               name: mongodb-data
+            - disk:
+              serial: 1SERIAL
+              name: secret-disk
             - disk:              
               serial: 2SERIALANSIBLEVARS
               name: ansible-vars-disk
@@ -52,6 +55,9 @@ spec:
         - name: mongodb-data
           persistentVolumeClaim:
             claimName: mongodb-pvc-{{ $i }}
+        - secret:
+            secretName: mongodb-cert-tls
+          name: secret-disk
         - configMap:
             name: mongo-ansible-vars
           name: ansible-vars-disk

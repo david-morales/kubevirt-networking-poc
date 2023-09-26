@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mongodb-cert
+  namespace: {{ .Values.namespace }}
+spec:
+  commonName: mongodb.{{ .Values.namespace }}.svc
+  dnsNames:
+  - "*.{{ .Values.namespace }}.svc.cluster.local"
+  - mongodb
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  secretName: mongodb-cert-tls
