@@ -17,9 +17,17 @@ stringData:
     write_files:
       - content: |
           #!/bin/bash
-          ansible-galaxy collection install community.mongodb
+          ansible-galaxy collection install -r requirements.yml
+          collection install -r requirements.yml
           ansible-playbook /mnt/ansible-playbook/ansible_playbook.yml
         path: /root/run_ansible.sh
+        permissions: '0755'
+       content: |
+          collections:
+          - name: https://github.com/ansible-collections/community.mongodb.git
+            type: git
+            version: 1.6.1
+        path: /root/requirements.yml
         permissions: '0755'
     ansible:
       package_name: ansible-core
