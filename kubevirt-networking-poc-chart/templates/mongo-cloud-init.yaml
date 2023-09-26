@@ -17,8 +17,7 @@ stringData:
     write_files:
       - content: |
           #!/bin/bash
-          ansible-galaxy collection install -r requirements.yml
-          collection install -r requirements.yml
+          ansible-galaxy collection install -r /root/requirements.yml          
           ansible-playbook /mnt/ansible-playbook/ansible_playbook.yml
         path: /root/run_ansible.sh
         permissions: '0755'
