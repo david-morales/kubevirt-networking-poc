@@ -1,8 +1,8 @@
-namespace: kubevirt-networking-poc
+namespace: poc-certificates
 
 app:
   image:
-    repository: image-registry.openshift-image-registry.svc:5000/kubevirt-networking-poc/kubevirt-networking-poc
+    repository: image-registry.openshift-image-registry.svc:5000/poc-certificates/poc-certificates
     tag: latest
   service:
     type: LoadBalancer
@@ -11,3 +11,14 @@ app:
 vm:
   imageName: quay.io/containerdisks/centos-stream
   imageTag: 9
+
+mongodb:
+  version: 4.2
+  hostname_prefix: mongodb-vm
+  replicaset_name: rsneo
+  replicaCount: 3
+  port: 27017
+  authorization: enabled
+  mongodb_use_tls: false
+  #define the user app password as the secret app-user-password
+  #specific_mongodb_version: 4.2.6-1.el8 not working

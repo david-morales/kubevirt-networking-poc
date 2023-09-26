@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-ansible-playbook
+  namespace: {{ .Values.namespace }}
+data:
+  ansible_playbook.yml: |-
+{{ .Files.Get "ansible/mongo-ansible-playbook.yml" | indent 4 }}

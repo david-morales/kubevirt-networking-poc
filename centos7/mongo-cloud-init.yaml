@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-vm-userdata
+  namespace: {{ .Values.namespace }}
+type: Opaque
+stringData:
+  userdata: |
+    #cloud-config
+    users:
+      - name: neo
+        plain_text_passwd: 'neo'
+        lock_passwd: false
+        groups: users, admin
+        sudo: ALL=(ALL) NOPASSWD:ALL
+
+    package_upgrade: true
+
+    write_files:
+      - content: |
+          #!/bin/bash
+          ansible-galaxy collection install community.mongodb
+          ansible-playbook /mnt/ansible-playbook/ansible_playbook.yml
+        path: /root/run_ansible.sh
+        permissions: '0755'
+
+    runcmd:
+      - [ yum, -y, install, epel-release ]
+      - [ yum, -y, install, python3, python3-pip, python-setuptools ]
+      - [ yum, -y, install, libselinux-python3 ]
+      - [ yum, -y, install, ansible ]
+      - mkdir -p /mnt/ansible-vars && mount /dev/$(lsblk --nodeps -no name,serial | grep 2SERIALANSIBLEVARS | cut -f1 -d' ') /mnt/ansible-vars
+      - mkdir -p /mnt/ansible-playbook && mount /dev/$(lsblk --nodeps -no name,serial | grep 3SERIALANSIBLEPLAYBK | cut -f1 -d' ') /mnt/ansible-playbook
+      - /root/run_ansible.sh

@@ -1,0 +1,99 @@
+#TO DO
+# - Use x.509 certificates for replicaset members authentication
+# - Use specific mongo version (not working)
+# - Use specific dbpath (not working)
+# - Use specific logpath (not working)
+- hosts: localhost
+  pre_tasks:
+    - name: Include Ansible vars
+      include_vars:
+        file: /mnt/ansible-vars/ansible_vars.yml
+  roles:
+    - community.mongodb.mongodb_linux
+    - community.mongodb.mongodb_repository
+    - community.mongodb.mongodb_install
+    - community.mongodb.mongodb_mongod
+  post_tasks:
+    - name: Ensure Python3 is available
+      yum:
+        name: 
+          - python3 
+          - python3-setuptools
+          - python3-pip
+        state: latest  
+    - name: Ensure setuptools is installed
+      pip:
+        name: setuptools
+        state: latest
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+    - name: Ensure pymongo is installed
+      pip:
+        name: pymongo
+        state: latest
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+    - name: Ensure mongo shell is installed
+      package:
+        name: mongodb-org-shell
+        state: present
+    - name: Generate list of mongodb hosts and convert to csv string
+      set_fact:
+        mongodb_list: "{{ mongodb_list|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:' + config_port|string] }}"
+        mongodb_csv: "{{ (mongodb_list|default([]) + ['mongodb-' + (item|string) + '.' + namespace + '.svc.cluster.local:' + config_port|string])|join(',') }}"
+      loop: "{{ range(0, replicaset_size)|list }}"
+    - debug:
+        var: mongodb_csv
+    - name: Ensure replicaset exists
+      community.mongodb.mongodb_replicaset:
+        login_host: localhost
+        login_port: '{{ config_port }}'
+        ssl: '{{ mongodb_use_tls }}'
+        ssl_certfile: '{{ mongodb_certificate_key_file }}'
+        ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
+        replica_set: '{{ replicaset_name }}'
+        members: '{{  mongodb_csv  }}'  
+        validate: no
+      register: create_rs
+      when: ansible_hostname is search("-0")               
+    - name: Wait for replicaset config to settle
+      pause:
+        seconds: 10
+      when: create_rs.changed
+    - name: Wait for the replicaset to stabilise
+      community.mongodb.mongodb_status:
+        login_host: localhost
+        login_port: '{{ config_port }}'
+        ssl: '{{ mongodb_use_tls }}'
+        ssl_certfile: '{{ mongodb_certificate_key_file }}'
+        ssl_ca_certs: '{{ mongodb_certificate_ca_file }}'
+        replica_set: '{{ replicaset_name }}'    
+        poll: 6
+        interval: 10
+        validate: minimal
+      register: rs
+      when: ansible_hostname is search("-0")
+    - debug:
+        var: rs
+    - name: Add MongoDB Admin User using localhost exception
+      community.mongodb.mongodb_user:
+        name: admin
+        password: '{{ admin_user_pwd }}'
+        database: admin
+        roles: root
+        state: present
+      register: admin_user
+      when:
+        - ansible_hostname is search("-0")
+    - debug:
+        var: admin_user
+    - name: Add the application user, the primary server is automatically discovered and written to
+      community.mongodb.mongodb_user:
+        login_user: admin
+        login_password: '{{ admin_user_pwd }}'
+        database: '{{ namespace }}'
+        name: '{{ namespace }}'
+        replica_set: '{{ replicaset_name }}'
+        password: '{{ app_user_pwd }}'
+        roles: dbOwner
+        state: present

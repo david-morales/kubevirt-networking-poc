@@ -1,0 +1,34 @@
+{{- $namespace := .Values.namespace }}
+{{- $secret := lookup "v1" "Secret" $namespace "app-user-password" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-ansible-vars
+  namespace: {{ .Values.namespace }}
+data:
+  ansible_vars.yml: |
+    ansible_python_interpreter: /usr/bin/python3
+    namespace: {{ .Values.namespace }}
+    hostname_prefix: {{ .Values.mongodb.hostname_prefix }}
+    replicaset_size: {{ .Values.mongodb.replicaCount }}
+    config_port: {{ .Values.mongodb.port }}
+    mongodb_version: {{ .Values.mongodb.version }}
+    #specific_mongodb_version: 4.2.6 NOT WORKING
+    bind_ip: 0.0.0.0
+    authorization: {{ .Values.mongodb.authorization }}
+    #db_path: /product/mongodb/data NOT WORKING
+    #log_path: /product/mongodb/log NOT WORKING
+    mongodb_use_tls: {{ .Values.mongodb.mongodb_use_tls }}
+    mongodb_certificate_key_file: /etc/ssl/mongodb.pem
+    mongodb_certificate_ca_file: /etc/ssl/ca.crt
+    skip_restart: false
+    replicaset_name: {{ .Values.mongodb.replicaset_name }}
+    repl_set_name: '{{ "{{ replicaset_name }}" }}'
+    replicaset: true
+    openssl_keyfile_path: /etc/replicaset-key
+    admin_user_pwd: admin
+    {{- if $secret }}
+    app_user_pwd: {{ index $secret.data "password" | b64dec }}
+    {{- else }}
+    app_user_pwd: 123456
+    {{- end }}

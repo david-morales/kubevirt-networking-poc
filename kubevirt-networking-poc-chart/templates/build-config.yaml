@@ -2,15 +2,15 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   name: kubevirt-networking-poc-bc
-  namespace: kubevirt-networking-poc
+  namespace: {{ .Values.namespace }}
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: kubevirt-networking-poc:latest
+      name: {{ .Values.namespace }}:latest
   source:
     git:
-      ref: main
+      ref: ansible-mongo-replicaset-v4
       uri: 'https://github.com/david-morales/kubevirt-networking-poc.git'
     type: Git
   strategy:

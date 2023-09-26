@@ -18,6 +18,28 @@ spec:
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
           ports:
             - containerPort: 8080
+          env:
+            - name: APP_DATABASE
+              value: {{ .Values.namespace }}
+            - name: REPLICASET
+              value: {{ .Values.mongodb.replicaset_name }}
+            - name: APP_USER
+              value: {{ .Values.namespace }}
+            - name: APP_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-user-password
+                  key: password
+            - name: TLS_ENABLED
+              value: {{ .Values.mongodb.mongodb_use_tls | quote }}
+          volumeMounts:
+            - name: mongodb-cert
+              mountPath: /certificates
+              readOnly: true
+      volumes:
+        - name: mongodb-cert
+          secret:
+            secretName: mongodb-cert-tls
 ---
 apiVersion: v1
 kind: Service
@@ -31,4 +53,3 @@ spec:
       targetPort: 8080
   selector:
     app: {{ .Values.namespace }}
-
