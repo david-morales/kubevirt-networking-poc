@@ -118,17 +118,8 @@
         - ansible_hostname is search("-0")
         - restore_backup
     - name: Restore MongoDB data from backup
-      community.mongodb.mongodb_shell:
-        login_host: '{{ primary }}'
-        login_port: '{{ config_port }}'
-        login_user: admin
-        login_password: '{{ admin_user_pwd }}'
-        eval: |
-          db.runCommand({
-            restore: 1,
-            archive: "/root/mongo_dump.gz",
-            gzip: true
-          })
+      ansible.builtin.command:
+        cmd: mongorestore --db '{{ namespace }}' --username admin --password '{{ admin_user_pwd }}' --gzip --archive=/root/mongo_dump.gz
       when:
         - ansible_hostname is search("-0")
         - restore_backup
