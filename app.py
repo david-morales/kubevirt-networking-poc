@@ -11,7 +11,7 @@ def welcome():
     app_database = os.environ.get('APP_DATABASE')
     replicaset = os.environ.get('REPLICASET')
     mongodb_user = os.environ.get('APP_USER')
-    mongodb_password = "os.environ.get('APP_USER_PASSWORD')"
+    mongodb_password = os.environ.get('APP_USER_PASSWORD')
     tls_enabled = os.environ.get('TLS_ENABLED', 'False')
 
     # Convert the string to a boolean
