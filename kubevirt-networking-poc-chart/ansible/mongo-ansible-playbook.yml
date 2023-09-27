@@ -111,8 +111,8 @@
         state: present
     - name: Ensure backup is present on the MongoDB host
       ansible.builtin.copy:
-        src: /mnt/mongodb-backup/mongodb-backup.gz
-        dest: /root/mongodb-backup.gz
+        src: /mnt/mongodb-backup/mongo_dump.gz
+        dest: /root/mongo_dump.gz
         mode: '0644'
       when:
         - ansible_hostname is search("-0")
@@ -126,7 +126,7 @@
         eval: |
           db.runCommand({
             restore: 1,
-            archive: "/root/mongodb-backup.gz",
+            archive: "/root/mongo_dump.gz",
             gzip: true
           })
       when:
