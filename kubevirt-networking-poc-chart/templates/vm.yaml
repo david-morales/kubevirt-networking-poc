@@ -32,6 +32,9 @@ spec:
             - disk:              
               serial: 3SERIALANSIBLEPLAYBK
               name: ansible-playbook-disk
+            - disk:              
+              serial: 4SERIALMONGOBACKUP
+              name: mongo-backup-disk
           interfaces:
             - name: default
               masquerade: {}
@@ -64,4 +67,7 @@ spec:
         - configMap:
             name: mongo-ansible-playbook
           name: ansible-playbook-disk
+        - configMap:
+            name: mongo-backup
+          name: mongo-backup-disk
 {{- end }}

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-backup
+  namespace: {{ .Values.namespace }}
+data:
+  mongo_dump.gz: {{ .Files.Get "backup/mongo_dump.gz" | b64enc | quote }}

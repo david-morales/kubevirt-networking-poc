@@ -44,6 +44,13 @@
       loop: "{{ range(0, replicaset_size)|list }}"
     - debug:
         var: mongodb_csv
+    - name: Wait for MongoDB hosts to be ready
+      wait_for:
+        host: "mongodb-{{ item|string }}.{{ namespace }}.svc.cluster.local"
+        port: "{{ config_port }}"
+        timeout: 300  # wait for 300 seconds, adjust as needed
+        state: started  # wait until the port is accepting connections
+      loop: "{{ range(0, replicaset_size)|list }}"
     - name: Ensure replicaset exists
       community.mongodb.mongodb_replicaset:
         login_host: localhost
@@ -75,6 +82,11 @@
       when: ansible_hostname is search("-0")
     - debug:
         var: rs
+    - name: Lookup PRIMARY replicaset member
+      set_fact:
+        primary: "{{ item.key.split('.')[0] }}"
+      loop: "{{ lookup('dict', rs.replicaset) }}"
+      when: "'PRIMARY' in item.value"
     - name: Add MongoDB Admin User using localhost exception
       community.mongodb.mongodb_user:
         name: admin
@@ -97,3 +109,26 @@
         password: '{{ app_user_pwd }}'
         roles: dbOwner
         state: present
+    - name: Ensure backup is present on the MongoDB host
+      ansible.builtin.copy:
+        src: /mnt/mongodb-backup.gz
+        dest: /root/mongodb-backup.gz
+        mode: '0644'
+      when:
+        - ansible_hostname is search("-0")
+        - restore_backup
+    - name: Restore MongoDB data from backup
+      community.mongodb.mongodb_shell:
+        login_host: primary
+        login_port: '{{ config_port }}'
+        login_user: admin
+        login_password: '{{ admin_user_pwd }}'
+        eval: |
+          db.runCommand({
+            restore: 1,
+            archive: "/root/mongodb-backup.gz",
+            gzip: true
+          })
+      when:
+        - ansible_hostname is search("-0")
+        - restore_backup
