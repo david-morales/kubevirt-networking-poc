@@ -111,7 +111,7 @@
         state: present
     - name: Ensure backup is present on the MongoDB host
       ansible.builtin.copy:
-        src: /mnt/mongodb-backup.gz
+        src: /mnt/mongodb-backup/mongodb-backup.gz
         dest: /root/mongodb-backup.gz
         mode: '0644'
       when:
