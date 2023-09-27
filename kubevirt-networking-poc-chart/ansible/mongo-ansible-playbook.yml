@@ -119,7 +119,7 @@
         - restore_backup
     - name: Restore MongoDB data from backup
       community.mongodb.mongodb_shell:
-        login_host: primary
+        login_host: '{{ primary }}'
         login_port: '{{ config_port }}'
         login_user: admin
         login_password: '{{ admin_user_pwd }}'
